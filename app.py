@@ -35,42 +35,56 @@ def thankyou():
 
 @app.route("/api/attractions")
 def api_attractions():
-    # 取得 URL 參數中的 page 和 keyword
-    page = request.args.get('page', type=int)
-    keyword = request.args.get('keyword', type=str)
+    try:
+        # 取得 URL 參數中的 page 和 keyword
+        page = request.args.get('page', type=int)
+        keyword = request.args.get('keyword', type=str)
 
-    # 計算 OFFSET 值
-    offset = 12 * (page - 1) if page > 0 else 0
+        # 計算 OFFSET 值
+        offset = 12 * (page - 1) if page > 0 else 0
 
-    # 建立 SQL 查詢
-    query = "SELECT * FROM attractions"
-    if keyword:
-        query += f" WHERE name LIKE '%{keyword}%'"
-    query += f" LIMIT 12 OFFSET {offset};"
+        # 建立 SQL 查詢
+        query = "SELECT * FROM attractions"
+        if keyword:
+            query += f" WHERE name LIKE '%{keyword}%'"
+        query += f" LIMIT 12 OFFSET {offset};"
 
-    cursor = db.cursor(dictionary=True)
-    cursor.execute(query)
-    results = cursor.fetchall()
-    cursor.close()
-    response_data = {
-        "results": results
-    }
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        response_data = {
+            "results": results
+        }
 
-    # 返回API响应，确保设置正确的字符集和内容类型
-    return jsonify(response_data), 200, {'Content-Type': 'application/json; charset=utf-8'}
+        return jsonify(response_data), 200, {'Content-Type': 'application/json; charset=utf-8'}
+    except Exception as e:
+        error_response = {
+            "error": str(e)
+        }
+        return jsonify(error_response), 500, {'Content-Type': 'application/json; charset=utf-8'}
 
 
 @app.route("/api/attraction/<attractionId>")
 def api_attraction_id(attractionId):
+    try:
+        # 嘗試將 attractionId 轉為整數
+        attraction_id = int(attractionId)
+    except ValueError:
+        # 如果id錯誤的話回傳400
+        return jsonify({"error": "Invalid attraction ID"}), 400
+
     cursor = db.cursor()
-    query = f"SELECT * FROM attractions WHERE id={attractionId}"
+    query = f"SELECT * FROM attractions WHERE id={attraction_id}"
     cursor.execute(query)
     attraction = cursor.fetchone()
     cursor.close()
 
     if not attraction:
-        return jsonify({"error": "Attraction not found"}), 404
+        # 如果景點不存在，回傳500錯誤
+        return jsonify({"error": "Attraction not found"}), 500
 
+    # 构建景点数据
     attraction_data = {
         "id": attraction[0],
         "name": attraction[1],
@@ -89,38 +103,43 @@ def api_attraction_id(attractionId):
     }
 
     return jsonify(response_data), 200, {'Content-Type': 'application/json; charset=utf-8'}
-
 	
 
 @app.route("/api/mrts")
-def api_arts():
-    cursor = db.cursor()
-    # 查询捷運站名稱和週邊景點數量
-    query = """
-        SELECT MRT, COUNT(*) as num_attractions
-        FROM attractions
-        WHERE MRT IS NOT NULL
-        GROUP BY MRT
-        ORDER BY num_attractions DESC
-        LIMIT 40
-    """
-    cursor.execute(query)
+def api_mrts():
+    try:
+        cursor = db.cursor()
+        # 查询捷運站名稱和週邊景點數量
+        query = """
+            SELECT MRT, COUNT(*) as num_attractions
+            FROM attractions
+            WHERE MRT IS NOT NULL
+            GROUP BY MRT
+            ORDER BY num_attractions DESC
+            LIMIT 40
+        """
+        cursor.execute(query)
 
-    # 获取查询结果
-    results = cursor.fetchall()
-    print(results)
+        results = cursor.fetchall()
 
-    # 按照週邊景點數量由大到小排序
-    sorted_results = sorted(results, key=lambda x: x[1], reverse=True)
+        # 按照週邊景點數量由大到小排序
+        sorted_results = sorted(results, key=lambda x: x[1], reverse=True)
 
-    # 取得前 40 筆捷運站名稱列表
-    mrt_names = [result[0] for result in sorted_results]
-    response=jsonify({"mrt_names": mrt_names})
-    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        # 取得前 40 筆捷運站名稱列表
+        mrt_names = [result[0] for result in sorted_results]
+        
+        response_data = {"mrt_names": mrt_names}
 
-    # 返回捷運站名稱列表
-    return response
+        response = jsonify(response_data)
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
 
+        # 返回捷運站名稱列表
+        return response
+
+    except Exception as e:
+        # 報錯回傳 500 
+        error_message = str(e)
+        return jsonify({"error": error_message}), 500
 
 
 
