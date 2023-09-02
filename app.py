@@ -9,14 +9,18 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = False  # 避免换行时产生的乱码
 app.config["JSONIFY_MIMETYPE"] = 'application/json; charset=utf-8'
 
-db = mysql.connector.connect(
-    host="NO-20230525204903",
-    user="jason",
-    password="12tina28",
-    database="stage2",
-    charset="utf8"  # 指定編碼為 UTF-8
-)
-    
+
+try:
+    db = mysql.connector.connect(
+        host="127.0.0.1",
+        user="jason",
+        password="12tina28",
+        database="stage2",
+        charset="utf8"
+    )
+except mysql.connector.Error as err:
+    print("Error:", err)
+
 
 # Pages
 @app.route("/")
