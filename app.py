@@ -12,7 +12,7 @@ app.config["JSONIFY_MIMETYPE"] = 'application/json; charset=utf-8'
 
 try:
     db = mysql.connector.connect(
-        host="localhost",
+        host="NO-20230525204903",
         user="jason",
         password="12tina28",
         database="stage2",
