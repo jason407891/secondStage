@@ -6,7 +6,7 @@ with open('taipei-attractions.json', 'r', encoding='utf-8') as file:
 
 
 db = mysql.connector.connect(
-    host="NO-20230525204903",
+    host="ip-172-31-12-2.ap-southeast-2.compute.internal",
     user="jason",
     password="12tina28",
     database="stage2"
