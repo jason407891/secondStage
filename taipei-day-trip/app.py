@@ -94,9 +94,14 @@ def api_attraction_id(attractionId):
         # 如果id錯誤的話回傳400
         return jsonify({"error":True, "message=":"請提供正確景點編號"}), 400
 
+    query_param={}
+
+    query = "SELECT * FROM attractions WHERE id = %(attraction_id)s"
+    query_param["attraction_id"] = attraction_id
+    
     cursor = db.cursor()
-    query = f"SELECT * FROM attractions WHERE id={attraction_id}"
-    cursor.execute(query)
+    cursor.execute(query, query_param)
+
     attraction = cursor.fetchone()
     cursor.close()
 
