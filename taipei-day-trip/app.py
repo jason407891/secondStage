@@ -46,17 +46,23 @@ def api_attractions():
         page = request.args.get('page', type=int)
         keyword = request.args.get('keyword', type=str)
 
+
         # 計算 OFFSET 值
         offset = 12 * (page - 1) if page > 0 else 0
 
         # 建立 SQL 查詢
         query = "SELECT id,name,CAT as category,description,address,direction as transport,mrt,latitude as lat,longitude as lng,files as images FROM attractions"
+        query_param={}
+        
         if keyword:
-            query += f" WHERE (name LIKE '%{keyword}%' OR mrt = '{keyword}')"
-        query += f" LIMIT 12 OFFSET {offset};"
+            query += " WHERE name LIKE %(keyword)s OR mrt = %(keyword)s"
+            query_param['keyword'] = f"%{keyword}"
+        
+        query += " LIMIT 12 OFFSET %(offset)s"
+        query_param['offset'] = offset
 
         cursor = db.cursor(dictionary=True)
-        cursor.execute(query)
+        cursor.execute(query, query_param)
         results = cursor.fetchall()
         for result in results:
             result['images']=json.loads(result["images"])
