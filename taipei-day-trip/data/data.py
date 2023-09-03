@@ -6,7 +6,7 @@ with open('taipei-attractions.json', 'r', encoding='utf-8') as file:
 
 
 db = mysql.connector.connect(
-    host="ip-172-31-12-2.ap-southeast-2.compute.internal",
+    host="localhost",
     user="jason",
     password="12tina28",
     database="stage2"
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS attractions (
     CAT VARCHAR(255),
     MEMO_TIME TEXT,
     POI VARCHAR(255),
-    files TEXT,  -- 將 file 改為 files 欄位名稱
+    files TEXT,
     idpt VARCHAR(255),
     latitude VARCHAR(255),
     description TEXT,
@@ -42,12 +42,22 @@ CREATE TABLE IF NOT EXISTS attractions (
 cursor.execute(create_table_query)
 db.commit()
 
-
+# 創建資料庫表格（如果不存在）
+cursor = db.cursor()
+create_mrttable_query = """
+CREATE TABLE IF NOT EXISTS MRT (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    MRT VARCHAR(255),
+    name VARCHAR(255)
+)
+"""
+cursor.execute(create_mrttable_query)
+db.commit()
 
 # 解析 JSON 中的資料並插入資料庫
 for entry in data['result']['results']:
     # 將 file 字串分割為陣列，並忽略大小寫
-    files = [f.lower() + '.jpg' for f in entry['file'].split('.jpg') if f and not f.endswith('.mp3')]
+    files = [f.lower() + '.jpg' for f in entry['file'].lower().split('.jpg') if f and not f.endswith('.mp3')]
     all_files=[]
     all_files.extend(files)
     insert_query = """
@@ -69,7 +79,21 @@ for entry in data['result']['results']:
     )
     cursor.execute(insert_query, values)
     db.commit()
-
+for entry in data['result']['results']:
+    # 將 file 字串分割為陣列，並忽略大小寫
+    files = [f.lower() + '.jpg' for f in entry['file'].split('.jpg') if f and not f.endswith('.mp3')]
+    all_files=[]
+    all_files.extend(files)
+    insert_query = """
+    INSERT INTO MRT (
+        MRT, name) VALUES (
+        %s, %s)
+    """
+    values = (
+        entry['name'], entry['MRT']
+    )
+    cursor.execute(insert_query, values)
+    db.commit()
 cursor.close()
 db.close()
 

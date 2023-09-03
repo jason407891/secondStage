@@ -3,16 +3,18 @@
 from flask import *
 import mysql.connector
 
+
 app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
-app.config["JSONIFY_PRETTYPRINT_REGULAR"] = False  # 避免换行时产生的乱码
+app.config["JSONIFY_PRETTYPRINT_REGULAR"] = False
 app.config["JSONIFY_MIMETYPE"] = 'application/json; charset=utf-8'
+app.config ['JSON_SORT_KEYS'] = False
 
 
 try:
     db = mysql.connector.connect(
-        host="ip-172-31-4-237.ap-southeast-2.compute.internal",
+        host="localhost",
         user="jason",
         password="12tina28",
         database="stage2",
@@ -48,23 +50,31 @@ def api_attractions():
         offset = 12 * (page - 1) if page > 0 else 0
 
         # 建立 SQL 查詢
-        query = "SELECT * FROM attractions"
+        query = "SELECT id,name,CAT as category,description,address,direction as transport,mrt,latitude as lat,longitude as lng,files as images FROM attractions"
         if keyword:
-            query += f" WHERE name LIKE '%{keyword}%'"
+            query += f" WHERE (name LIKE '%{keyword}%' OR mrt = '{keyword}')"
         query += f" LIMIT 12 OFFSET {offset};"
 
         cursor = db.cursor(dictionary=True)
         cursor.execute(query)
         results = cursor.fetchall()
+        for result in results:
+            result['images']=json.loads(result["images"])
         cursor.close()
         response_data = {
-            "results": results
+            "nextPage":page+1,
+            "data":results
         }
-
-        return jsonify(response_data), 200, {'Content-Type': 'application/json; charset=utf-8'}
+        
+        json_data = json.dumps(response_data, ensure_ascii=False, sort_keys=False, indent=None)
+        response = Response(json_data, content_type="application/json; charset=utf-8")
+        
+        return response
+        #return jsonify(response_data, sort_keys=False), 200, {'Content-Type': 'application/json; charset=utf-8'}
     except Exception as e:
         error_response = {
-            "error": str(e)
+            "error":True,
+            "message":str(e)
         }
         return jsonify(error_response), 500, {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -76,7 +86,7 @@ def api_attraction_id(attractionId):
         attraction_id = int(attractionId)
     except ValueError:
         # 如果id錯誤的話回傳400
-        return jsonify({"error": "Invalid attraction ID"}), 400
+        return jsonify({"error":True, "message=":"請提供正確景點編號"}), 400
 
     cursor = db.cursor()
     query = f"SELECT * FROM attractions WHERE id={attraction_id}"
@@ -86,9 +96,9 @@ def api_attraction_id(attractionId):
 
     if not attraction:
         # 如果景點不存在，回傳500錯誤
-        return jsonify({"error": "Attraction not found"}), 500
+        return jsonify({"error":True, "message=":"請提供正確景點編號"}), 400
 
-    # 构建景点数据
+    # 景點資料回傳
     attraction_data = {
         "id": attraction[0],
         "name": attraction[1],
@@ -99,14 +109,18 @@ def api_attraction_id(attractionId):
         "mrt": attraction[9],
         "lat": attraction[17],
         "lng": attraction[5],
-        "images": [attraction[15]]
+        "images":json.loads(attraction[15])
     }
 
     response_data = {
         "data": attraction_data
     }
-
-    return jsonify(response_data), 200, {'Content-Type': 'application/json; charset=utf-8'}
+    
+    json_data = json.dumps(response_data, ensure_ascii=False, sort_keys=False, indent=None)
+    response = Response(json_data, content_type="application/json; charset=utf-8")
+    
+    return response
+    #return jsonify(response_data, sort_keys=False), 200, {'Content-Type': 'application/json; charset=utf-8'}
 	
 
 @app.route("/api/mrts")
@@ -115,7 +129,7 @@ def api_mrts():
         cursor = db.cursor()
         # 查询捷運站名稱和週邊景點數量
         query = """
-            SELECT MRT, COUNT(*) as num_attractions
+            SELECT MRT , COUNT(*) as num_attractions
             FROM attractions
             WHERE MRT IS NOT NULL
             GROUP BY MRT
@@ -132,7 +146,7 @@ def api_mrts():
         # 取得前 40 筆捷運站名稱列表
         mrt_names = [result[0] for result in sorted_results]
         
-        response_data = {"mrt_names": mrt_names}
+        response_data = {"data": mrt_names}
 
         response = jsonify(response_data)
         response.headers['Content-Type'] = 'application/json; charset=utf-8'
@@ -143,10 +157,9 @@ def api_mrts():
     except Exception as e:
         # 報錯回傳 500 
         error_message = str(e)
-        return jsonify({"error": error_message}), 500
+        return jsonify({"error":True,
+                         "message":error_message}), 500
 
 
 
 app.run(host="0.0.0.0", port=5000)
-
-print(123)
