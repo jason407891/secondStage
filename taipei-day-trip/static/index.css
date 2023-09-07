@@ -280,7 +280,7 @@
     color:#FFFFFF;
 }
 
-@media(max-width:600px){
+@media(max-width:360px){
     .navigation_title{
         width:360px;
         height:54px;
@@ -290,12 +290,14 @@
         height:54px;
     }
     .taipei_title{
+        margin-left: 10px;
         width:150px;
         height:34px;
     }
     .signin{
         width: 175px;
         height: 34px;
+        margin-right: 0px;
     }
     .navbtn{
         font: 10px "Noto Sans TC";
