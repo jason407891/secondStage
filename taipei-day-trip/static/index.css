@@ -1,6 +1,6 @@
 .body{
     margin:0px;
-    width:1920px;
+    width:100%;
     height:100%;
     display:flex;
     flex-direction: column;
@@ -8,7 +8,7 @@
 }
 .navigation_title{
     height:54px;
-    width:1920px;
+    width:100%;
     display:flex;
     justify-content:center;
     align-items: center;
@@ -50,7 +50,7 @@
 }
 .hero_section{
     display:flex;
-    width:1920px;
+    width:100%;
     height:320px; 
     position:relative;
     overflow: hidden;
@@ -187,15 +187,15 @@
 
 .attractions{
     display:flex;
-    width: 1960px;
+    width: 100%;
     min-height: 816px;
     height:auto;
-    flex: auto;
     justify-content: center;
 }
 
 .attractions_group{
     width: 1170px;
+    flex:auto;
     min-height: 786px;
     height: auto;
     display: flex;
@@ -208,7 +208,7 @@
     position: relative; /*設定相對定位*/
     flex: none;
     display: flex;
-    width: 270px;
+    width: 22.5%;
     height: 242px;
     border-radius: 5px;
     border: 1px solid #E8E8E8;
@@ -216,7 +216,7 @@
 .detail1{
     display:flex;
     position: absolute; /*設定相對定位*/
-    width:270px;
+    width: 100%;
     height:45px;
     bottom: 0px;
     background-color: white;
@@ -226,21 +226,21 @@
 
 .mrt_detail{
     display:flex;
-    width: 250px;
+    width: 80%;
     height: 25px;
     justify-content:space-between;
 }
 
 .detail2{
     position: absolute;
-    width: 270px;
+    width: 100%;
     height: 40px;
     bottom:45px;
 }
 .attraction_name{
     position: relative;
     display:flex;
-    width: 270px;
+    width: 100%;
     height: 40px;
     font:16px "Noto Sans TC";
     font-weight: 700;
@@ -252,7 +252,7 @@
 }
 .rectangle{
     position: absolute; /*設定相對定位*/
-    width: 270px;
+    width: 100%;
     height: 40px;
     opacity: 60%;
     background-color: #000000;
@@ -265,7 +265,7 @@
 }
 .footer{
     display:flex;
-    width: 1920px;
+    width: 100%;
     height: 104px;
     background-color: gray;
     justify-content: center;
@@ -282,11 +282,11 @@
 
 @media(max-width:360px){
     .navigation_title{
-        width:360px;
+        width:100%;
         height:54px;
     }
     .navigation{
-        width:360px;
+        width:100%;
         height:54px;
     }
     .taipei_title{
@@ -305,10 +305,10 @@
     }
     .hero_section{
         height:320px;
-        width:360px;
+        width:100%;
     }
     .heroimg{
-        width:360px;
+        width:100%;
         height:100%;
     }
     .slogan{
@@ -353,11 +353,11 @@
         width:100%;
     }
     .main{
-        width: 360px;
+        width: 100%;
     }
     .list_bar{
         height: 70px;
-        width: 360px;
+        width: 100%;
     }
     .attractions{
         min-height: 605px;
@@ -365,7 +365,7 @@
     }
     .attractions_group{
         height: 605px;
-        width: 352px;
+        width: 100%;
     }
     .attraction{
         width:332px;
