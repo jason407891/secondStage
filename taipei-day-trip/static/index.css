@@ -1,0 +1,437 @@
+.body{
+    margin:0px;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.navigation_title{
+    height:54px;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    position: sticky;
+    top:0;
+    z-index: 2;
+    background-color: white;
+}
+.navigation{
+    display:flex;
+    height:34px;
+    width:1200px;
+    color:#448899;
+    justify-content:space-between;
+    align-items: center;
+    position: sticky;
+    top:0;
+    z-index: 3;
+}
+
+.taipei_title{
+    display:flex;
+    font: 30px "Noto Sans TC";
+    font-weight: 700;
+}
+
+.signin{
+    display:flex;
+    height: 54px;
+    text-align: right;
+    align-items:center;
+}
+
+.navbtn{
+    padding:10px;
+    font: 16px "Noto Sans TC";
+    font-weight:500;
+    line-height:13.3px;
+}
+.hero_section{
+    display:flex;
+    width:100%;
+    height:320px; 
+    position:relative;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}
+.heroimg{
+    width:100%;
+    height:320px;
+    object-fit:cover;
+}
+
+.slogan{
+    position: absolute;
+    width:1200px;
+    flex:auto;
+}
+.slogan_content{
+    width:100%;
+    height:78px;
+}
+.first_slogan{
+    width:100%;
+    height: 41px;
+    font: 28px "Noto Sans TC";
+    color: #F8F8F8;
+    flex:auto;
+}
+.second_slogan{
+    width:100%;
+    height: 22px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700; 
+    color: #F8F8F8;
+    flex:auto;
+}
+.search{
+    width: 460px;
+    height: 46px;
+}
+.search_bar{
+    width: 100%;
+    height: 46px;
+}
+.searchbar_content{
+    width: 100%;
+    height: 100%;
+    display:flex;
+}
+.inputfield{
+    width:400px;
+    height: 46px;
+}
+.inputname{
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    border: 0px;
+}
+.searchbtn{
+    display: flex;
+    background-color:#448899;
+    width:60px;
+    height: 46px;
+    justify-content: center;
+    align-items: center;
+}
+.searchimg{
+    width:30px;
+    height:30px;
+}
+.main{
+    display:flex;
+    flex-direction: column;
+    width:100%;
+    height:auto;
+    flex-grow: 1;
+    justify-content: center;
+}
+.bar{
+    width:100%;
+    display:flex;
+    justify-content: center;
+}
+.list_bar{
+    width:1200px;
+    display:flex;
+    justify-content: center;
+    background-color: #FFFFFF;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+
+}
+.left_container{
+    display: flex;
+    width:47px;
+    height:50px;
+    align-items: center;
+    padding:9px 0px 9px 15px;
+}
+.leftbtn{
+    width:32px;
+    height:32px;
+}
+.container{
+    width:1106px;
+    height: 70px;
+    align-items: center;
+    display:flex;
+    overflow: hidden;
+}
+.list_item_container{
+    display:flex;
+    width: auto;
+    height: 24px;
+    align-items: center;
+    overflow: hidden;   
+    gap:30px; 
+
+}
+.list_item{
+    width: auto;
+    white-space: nowrap;
+    height: 24px;
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+    text-align: center;
+}
+.right_container{
+    width: 47px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding:9px 15px 9px 0px;
+}
+.rightbtn{
+    width:32px;
+    height:32px;
+}
+
+.attractions{
+    display:flex;
+    width: 100%;
+    min-height: 816px;
+    height:auto;
+    justify-content: center;
+}
+
+.attractions_group{
+    width: 1200px;
+    min-height: 786px;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 15px;
+}
+.attraction{
+    position: relative; /*設定相對定位*/
+    flex: none;
+    display: flex;
+    width: 22.5%;
+    height: 242px;
+    border-radius: 5px;
+    border: 1px solid #E8E8E8;
+}
+.detail1{
+    display:flex;
+    position: absolute; /*設定相對定位*/
+    width: 100%;
+    height:45px;
+    bottom: 0px;
+    background-color: white;
+    justify-content: center;
+    align-items: center;
+}
+
+.mrt_detail{
+    display:flex;
+    width: 80%;
+    height: 25px;
+    justify-content:space-between;
+}
+
+.detail2{
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    bottom:45px;
+}
+.attraction_name{
+    position: relative;
+    display:flex;
+    width: 100%;
+    height: 40px;
+    font:16px "Noto Sans TC";
+    font-weight: 700;
+    line-height:13.3px;
+    color:white;
+    align-items: center;
+    z-index: 1;
+    left:20px;
+}
+.rectangle{
+    position: absolute; /*設定相對定位*/
+    width: 100%;
+    height: 40px;
+    opacity: 60%;
+    background-color: #000000;
+    bottom:0px;
+}
+.mrt_image{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.footer{
+    display:flex;
+    width: 100%;
+    height: 104px;
+    background-color: gray;
+    justify-content: center;
+    align-items: center;
+}
+.copyright{
+    width: 234px;
+    height: 24px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    text-align: center;
+    color:#FFFFFF;
+}
+
+
+@media(max-width:1200px){
+    .navigation{
+        width:360px;
+    }
+    .slogan{
+        width: 320px;
+        height: 149px;
+        padding:0px;
+        }
+    .search{
+        width:360px;
+    }
+    .list_bar{
+        width:360px;
+    }
+    .attractions_group{
+        width:90%;
+    }
+    .attraction{
+        width:30%;
+    }
+
+}
+@media(max-width:360px){
+    .navigation_title{
+        width:100%;
+        height:54px;
+    }
+    .navigation{
+        width:100%;
+        height:54px;
+    }
+    .taipei_title{
+        margin-left: 10px;
+        width:150px;
+        height:34px;
+    }
+    .signin{
+        width: 175px;
+        height: 34px;
+        margin-right: 0px;
+    }
+    .navbtn{
+        font: 10px "Noto Sans TC";
+        height:14px;
+    }
+    .hero_section{
+        height:320px;
+        width:100%;
+    }
+    .heroimg{
+        width:100%;
+        height:100%;
+    }
+    .slogan{
+        width: 320px;
+        height: 149px;
+        padding:0px;
+    }
+    .slogan_content{
+        width: 320px;        
+    }
+    .first_slogan{
+        width:320px;
+    }
+    .second_slogan{
+        width: 320px;
+        height:22px;
+    }
+    .inputfield{
+        width: 285px;
+        height: 46px; 
+    }
+    .inputname{
+        width: 285px;
+        height: 46px;
+    }
+    .search{
+        width: 285px;
+    }
+    .search_bar{
+        width: 285px;
+    }
+    .inputfield{
+        width:100%;
+    }
+    .searchbar_content{
+        width: 285px;
+        height: 46px;
+    }
+    .searchbtn{
+        width: 60px;
+        height: 46px;
+    }
+    .inputname{
+        width:100%;
+    }
+    .main{
+        width: 100%;
+        height: auto;
+        justify-content: flex-start;
+    }
+    .list_bar{
+        height: 70px;
+        width: 100%;
+    }
+    .attractions{
+        min-height: 605px;
+        width: 98%;
+    }
+    .attractions_group{
+        min-height: 605px;
+        height: auto;
+        width: 100%;
+    }
+    .attraction{
+        margin: 15px;
+        width:322px;
+        height: 280px;
+
+    }
+    .detail1{
+        width:100%;
+    }
+    .detail2{
+        width:322px;
+        height:40px;
+        bottom: 45px;
+    }
+    .attraction_name{
+        width: 302px;
+        height: 20px;
+        top:10px;
+    }
+    .mrt_image{
+        width:322px;
+        height:280px;
+    }
+    .rectangle{
+        width:100%;
+    }
+    .mrt_detail{
+        width:301px;
+    }
+    .footer{
+        display:none;
+    }
+}

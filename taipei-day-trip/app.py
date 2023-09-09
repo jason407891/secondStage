@@ -4,6 +4,7 @@ from flask import *
 import mysql.connector
 
 
+
 app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
@@ -43,40 +44,49 @@ def thankyou():
 def api_attractions():
     try:
         # 取得 URL 參數中的 page 和 keyword
-        page = request.args.get('page', type=int)
+        page = request.args.get('page',type= int)
         keyword = request.args.get('keyword', type=str)
+        if page>=0:
+            # 計算 OFFSET 值
+            offset = 12 * page if page >= 0 else 0
 
+            # 建立 SQL 查詢
+            query = "SELECT id,name,CAT as category,description,address,direction as transport,MRT as mrt,latitude as lat,longitude as lng,files as images FROM attractions"
+            query_param={}
+            
+            if keyword:
+                query += " WHERE (`MRT` = %(keyword)s OR `name` LIKE %(keyword_like)s)"
+                query_param['keyword'] = keyword
+                query_param['keyword_like'] = f"%{keyword}%"
+            query += " LIMIT 12 OFFSET %(offset)s"
+            query_param['offset'] = offset
+            cursor = db.cursor(dictionary=True)
+            cursor.execute(query, query_param)
+            results = cursor.fetchall()
 
-        # 計算 OFFSET 值
-        offset = 12 * (page - 1) if page > 0 else 0
-
-        # 建立 SQL 查詢
-        query = "SELECT id,name,CAT as category,description,address,direction as transport,mrt,latitude as lat,longitude as lng,files as images FROM attractions"
-        query_param={}
-        
-        if keyword:
-            query += " WHERE name LIKE %(keyword)s OR mrt = %(keyword)s"
-            query_param['keyword'] = f"%{keyword}"
-        
-        query += " LIMIT 12 OFFSET %(offset)s"
-        query_param['offset'] = offset
-
-        cursor = db.cursor(dictionary=True)
-        cursor.execute(query, query_param)
-        results = cursor.fetchall()
-        for result in results:
-            result['images']=json.loads(result["images"])
-        cursor.close()
-        response_data = {
-            "nextPage":page+1,
-            "data":results
-        }
-        
-        json_data = json.dumps(response_data, ensure_ascii=False, sort_keys=False, indent=None)
-        response = Response(json_data, content_type="application/json; charset=utf-8")
-        
-        return response
-        #return jsonify(response_data, sort_keys=False), 200, {'Content-Type': 'application/json; charset=utf-8'}
+            if not results:
+                 nextpage = None
+            else:
+                 nextpage = page+1
+            for result in results:
+                result['images']=json.loads(result["images"])
+            cursor.close()
+            response_data = {
+                "nextPage":nextpage,
+                "data":results
+            }
+            
+            json_data = json.dumps(response_data, ensure_ascii=False, sort_keys=False, indent=None)
+            response = Response(json_data, content_type="application/json; charset=utf-8")
+            
+            return response
+            #return jsonify(response_data, sort_keys=False), 200, {'Content-Type': 'application/json; charset=utf-8'}
+        else:
+            response = {
+                "error":True,
+                "message":"please enter page"
+            }
+            return jsonify(response), 500, {'Content-Type': 'application/json; charset=utf-8'}
     except Exception as e:
         error_response = {
             "error":True,
