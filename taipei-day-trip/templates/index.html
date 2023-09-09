@@ -29,7 +29,7 @@
                         <div class="inputfield">
                             <input class="inputname" placeholder="   輸入景點名稱查詢"></input>
                         </div>
-                        <div class="searchbtn" onclick="search_attraction()" onmouseover="style.opacity=0.7" onmouseout="style.opacity=1">
+                        <div class="searchbtn" onmouseover="style.opacity=0.7" onmouseout="style.opacity=1">
                             <img src="./static/searchbtn.png" class="searchimg"/>
                         </div>
                     </div>
@@ -38,6 +38,7 @@
         </div>
     </div>
     <div class="main">
+        <div class="bar">
         <div class="list_bar">
             <div class="left_container">
                 <img src="./static/leftbtn.jpg" class="leftbtn" onmouseover="style.opacity=0.7" onmouseout="style.opacity=1"/>
@@ -50,6 +51,7 @@
             <div class="right_container">
                 <img src="./static/rightbtn.jpg" class="rightbtn" onmouseover="style.opacity=0.7" onmouseout="style.opacity=1"/>
             </div>
+        </div>
         </div>
         <div class="attractions">
             <div class="attractions_group">
@@ -76,50 +78,57 @@
         <div class="footer">
             <div class="copyright">COPYRIGHT@2021台北一日遊</div>
         </div>
+        <div class="loadmore"></div>
     </div>
 
 
     <script>
- 
-    
-    nextpage=1 //一開始nextpage是1
-    function get_attraction(page_num){
-    //觸發fetch請求來取得api/attractions
-    fetch('/api/attractions?page='+page_num)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            let attractionsGroup = document.querySelector('.attractions_group');
-            if (nextpage!=""){
-                nextpage=data.nextPage;
-            }
-            else{return;}
-            data.data.forEach(attraction => {
-                let attractionElement = document.createElement('div');
-                attractionElement.classList.add('attraction');
-                attractionElement.innerHTML = `
-                    <div class="detail1">
-                        <div class="mrt_detail">
-                            <div class="mrt_name">${attraction.mrt}</div>
-                            <div class="attraction_cat">${attraction.category}</div>
+    let nextpage=1 //一開始nextpage是1
+    function get_attraction(page_num, keyword){
+        if (nextpage !== null){
+            observer.unobserve(footElement);
+        //觸發fetch請求來取得api/attractions
+        let url = '/api/attractions?page='+page_num;
+        if(keyword){
+            url += '&keyword=' + keyword;
+        }
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let attractionsGroup = document.querySelector('.attractions_group');
+                if (nextpage!=""){
+                    nextpage=data.nextPage;
+                }
+                else{return;}
+                data.data.forEach(attraction => {
+                    let attractionElement = document.createElement('div');
+                    attractionElement.classList.add('attraction');
+                    attractionElement.innerHTML = `
+                        <div class="detail1">
+                            <div class="mrt_detail">
+                                <div class="mrt_name">${attraction.mrt}</div>
+                                <div class="attraction_cat">${attraction.category}</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="detail2">
-                        <div class="attraction_name">${attraction.name}</div>
-                        <div class="rectangle"></div>
-                    </div>
-                    <img src="${attraction.images[0]}" class="mrt_image">
-                `;
-                attractionsGroup.appendChild(attractionElement);
-            });
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-        });}
+                        <div class="detail2">
+                            <div class="attraction_name">${attraction.name}</div>
+                            <div class="rectangle"></div>
+                        </div>
+                        <img src="${attraction.images[0]}" class="mrt_image">
+                    `;
+                    attractionsGroup.appendChild(attractionElement);
+                });
+                observer.observe(footElement);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });}}
+
 
     function get_mrt(){
         fetch('api/mrts')
@@ -150,7 +159,7 @@
                     let input_text=document.querySelector(".inputname");
                     //把被點擊的捷運站名字丟進去輸入景點名稱查詢
                     input_text.value=itemtext;
-                    search_attraction();
+                    search_attraction(0,input_text.value);
                 }
                 }));
             })
@@ -177,10 +186,16 @@
 
 
             }
-         
-    function search_attraction(){
-        let keyword = document.querySelector('.inputname').value;
-        fetch('api/attractions?page=1&keyword='+keyword)
+    
+    
+    function search_attraction(searchpage, keyword){
+        let page=parseInt(searchpage,10);
+        let url = '/api/attractions?page='+page;
+        if(keyword){
+            url += '&keyword=' + keyword;
+        }
+        observer.unobserve(footElement);
+        fetch(url)
         .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -189,8 +204,13 @@
             })
         .then(
             data =>{
-                let attractionsGroup = document.querySelector(".attractions_group")
+                let attractionsGroup = document.querySelector(".attractions_group");
                 attractionsGroup.textContent="";
+
+                if (nextpage!=""){
+                    nextpage=data.nextPage;
+                }
+                else{return;}
 
                 observer.unobserve(footElement);
                 if (data.data.length===0){
@@ -217,6 +237,7 @@
                 `;
                 attractionsGroup.appendChild(attractionElement);
                 });}
+                observer.observe(footElement);
             })
             .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
@@ -231,16 +252,16 @@
    //載入attraction資訊
    window.onload =  function () {
        if(firstload){
-        get_attraction(1);
+        get_attraction(0);
         setTimeout(function () {
             get_mrt();
             }, 50);} // time.sleep 0.01 seconds
         firstload=false;
     };
 
-
     //自動載入下一頁的資訊
-    let footElement = document.querySelector('.footer');
+    let footElement = document.querySelector('.loadmore');
+
     let option={
         root: null,
         rootMargin: "0px",
@@ -249,14 +270,43 @@
     let observer = new IntersectionObserver((entries)=>{
         entries.forEach((entry)=>{
             if(entry.isIntersecting){
-            get_attraction(nextpage);
+                let input_name=document.querySelector(".inputname");
+                console.log(input_name);
+                let keyword = input_name.value;
+                if (keyword){
+                    console.log("66666");
+                    get_attraction(nextpage,keyword);
+                }
+                else{
+                    get_attraction(nextpage);
+                }
+
+                /*
+                if (nextpage==null){   //max_page=5
+                    console.log("no more data");
+                    console.log(nextpage);
+                }
+                else{
+                    let key_word = document.querySelector('.inputname').value;
+                    get_attraction(nextpage,key_word);
+                }
+                */
             //observer.unobserve(entry.target);
             }
         });
     }, option);
     observer.observe(footElement);
-    //observer.unobserve(footElement);
+    //observer.unobserve(footElement);}
 
+
+    //如果搜尋按鈕被點擊，就要去搜尋關鍵字
+    let searchbtn = document.querySelector(".searchbtn");
+    searchbtn.addEventListener("click",(event)=>{
+        let keyword=document.querySelector(".inputname");
+        nextpage=1;
+        search_attraction(0,keyword.value);
+        observer.observe(footElement);
+    })
     
     </script>
 </body>

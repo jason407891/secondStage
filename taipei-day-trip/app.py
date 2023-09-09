@@ -44,11 +44,11 @@ def thankyou():
 def api_attractions():
     try:
         # 取得 URL 參數中的 page 和 keyword
-        page = request.args.get('page', type=int)
+        page = request.args.get('page',type= int)
         keyword = request.args.get('keyword', type=str)
-        if page:
+        if page>=0:
             # 計算 OFFSET 值
-            offset = 12 * (page - 1) if page > 0 else 0
+            offset = 12 * page if page >= 0 else 0
 
             # 建立 SQL 查詢
             query = "SELECT id,name,CAT as category,description,address,direction as transport,MRT as mrt,latitude as lat,longitude as lng,files as images FROM attractions"
@@ -57,20 +57,22 @@ def api_attractions():
             if keyword:
                 query += " WHERE (`MRT` = %(keyword)s OR `name` LIKE %(keyword_like)s)"
                 query_param['keyword'] = keyword
-                query_param['keyword_like'] = f"%{keyword}"
-
-            
+                query_param['keyword_like'] = f"%{keyword}%"
             query += " LIMIT 12 OFFSET %(offset)s"
             query_param['offset'] = offset
-
             cursor = db.cursor(dictionary=True)
             cursor.execute(query, query_param)
             results = cursor.fetchall()
+
+            if not results:
+                 nextpage = None
+            else:
+                 nextpage = page+1
             for result in results:
                 result['images']=json.loads(result["images"])
             cursor.close()
             response_data = {
-                "nextPage":page+1,
+                "nextPage":nextpage,
                 "data":results
             }
             
