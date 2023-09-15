@@ -1,0 +1,212 @@
+<!DOCTYPE html> <!--文件型態-->
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁標題</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}"/>
+    <meta charset="utf-8">
+</head>
+<body class="body">
+    <div class="navigation_title">
+        <div class="navigation">
+            <a  href="/" class="taipei_title">台北一日遊</a>
+            <div class="signin">
+                <div class="navbtn">預定行程</div>
+                <div class="navbtn">登入/註冊</div>
+            </div>
+        </div>
+    </div>
+    <hr class="divider">
+    <div class="attraction_section">
+        <div class="section"> 
+            <!--
+
+            <div class="picture_current">
+                <img src="../static/welcome.png" class="picture_current">
+            </div>
+            <div class="profile">
+                <div class="attraction_title">平安鐘</div>
+                <div class="attraction_location">公共藝術at忠孝復興</div>
+                <div class="booking_form">
+                    <div class="booking_text">訂購導覽行程</div>
+                    <div class="booking_description">以此景點為中心的一日行程，帶您探索城市角落故事</div>
+                    <div class="field_date">
+                        <div class="select_date_text">選擇日期：</div>
+                        <input type="date" class="select_date_input"></input>
+                    </div>
+                    <div class="field_time">
+                        <div class="select_time_text">選擇時間：</div>
+                        <input type="radio" name="time" value="day" class="select_time_input">上半天</input>
+                        <input type="radio" name="time" value="night" class="select_time_input">下半天</input>
+                    </div>
+                    <div class="field_price">
+                        <div class="guide_fee">導覽費用：</div>
+                        <div class="guide_price">新台幣2000元</div>
+                    </div>
+                    <div class="booking_button">開始預約行程</div>
+                </div>
+            </div>
+
+        </div>
+        <hr class="divider"></hr>
+        <div class="infors">
+            <div class="info_description">平安鐘祈求大家的平安，這是為了紀念921地震週年的設計，在喧鬧的廣場上每個小時鳴鐘，保佑平安，祈禱臺灣不會再發生這樣的天災。雙手合十加上108個黃色的琉璃乳丁，隨著緩緩流下的水，在底下的一個小噴泉噴出。雙手合十的意義，一個是祈福，一個是包容，教我們要包容這樣的改變，撫平這樣的傷口。下面的水緩緩流出，代表著人的生命力是不斷地延續下去。緩緩地鐘聲，卻帶來心中的寧靜。 這個平安鐘是由建築師姚仁喜與琉璃創作家王俠軍共同設計，長6公尺、寬5公尺，以鑄銅製成，由法鼓山文教基金會全額出資。平安鐘點綴都市景觀，不時提醒大家，面對刻骨銘心的災難痛苦，更應該有謙卑的一顆心。</div>
+            <div class="info_address">景點地址：</div>
+            <div class="address_detail">臺北市 大安區忠孝東路4段</div>
+            <div class="info_direction">交通方式：</div>
+            <div class="direction_detail">捷運站名：忠孝復興站4號出口1.公車：204、212、212直、232、232副、262、262(區間)、278、299、521、605、605(副)、605(新台五線)、667、903、忠孝新幹線至頂好市場站 2.車位：太平洋崇光百貨地下停車場或市民大道附近地下停車場</div>
+        
+            -->
+    </div>
+
+    </div>
+    <div class="attfooter">
+        <div class="copyright">COPYRIGHT@2021台北一日遊</div>
+    </div>
+
+
+<script>
+    function get_attraction_detail(id){
+        return fetch(`/api/attraction/${id}`)
+        .then(response=>{
+            if (!response.ok){
+                throw new Error("response not ok");
+            }
+            return response.json();
+        });
+    }
+
+
+    async function load_attraction_details() {
+    let currentPath = window.location.pathname;
+    let attractionIdMatch = currentPath.match(/\/attraction\/(\d+)/);
+    if (attractionIdMatch) {
+        let attractionId = attractionIdMatch[1];
+        try {
+            let response = await get_attraction_detail(attractionId);
+            data = response.data;
+            let attractionDetailsContainer = document.getElementsByClassName('attraction_section')[0];
+            attractionDetailsContainer.innerHTML = `
+            <div class="section">
+                <div class="picture_current">
+                    <div class=changebtn>
+                        <img src="../static/left_arrow.png" class="pic_left_btn"></img>
+                        <img src="../static/right_arrow.png" class="pic_right_btn"></img>
+                    </div>
+                    <div class="pic_circle_btn"></div>
+                    <div class="current_pic_container"></div>
+                </div>
+                <div class="profile">
+                    <div class="attraction_title">${data.name}</div>
+                    <div class="attraction_location">${data.category} at ${data.mrt}</div>
+                    <div class="booking_form">
+                        <div class="booking_text">訂購導覽行程</div>
+                        <div class="booking_description">以此景點為中心的一日行程，帶您探索城市角落故事</div>
+                        <div class="field_date">
+                            <div class="select_date_text">選擇日期：</div>
+                            <input type="date" class="select_date_input"></input>
+                        </div>
+                        <div class="field_time">
+                            <div class="select_time_text">選擇時間：</div>
+                            <input type="radio" name="time" id="day" value="day" class="select_time_input" data-price="2000">
+                            <label for="day" class="label_day">上半天</label>
+                            <input type="radio" name="time" id="night" value="night" class="select_time_input" data-price="2500">
+                            <label class="label_night" for="night">下半天</label>
+                        </div>
+                        <div class="field_price">
+                            <div class="guide_fee">導覽費用：</div>
+                            <div class="guide_price"></div>
+                        </div>
+                        <div class="booking_button">開始預約行程</div>
+                    </div>
+                </div>
+
+            </div>
+            <hr class="divider"></hr>
+            <div class="infors">
+                <div class="info_description">${data.description}</div>
+                <div class="info_address">景點地址：</div>
+                <div class="address_detail">${data.address}</div>
+                <div class="info_direction">交通方式：</div>
+                <div class="direction_detail">${data.transport}</div>
+            </div>`;
+            //新增照片
+            let picture_container = document.getElementsByClassName("current_pic_container")[0];
+            let circle = document.getElementsByClassName("pic_circle_btn")[0];
+            data.images.forEach(imageSrc => {
+                let imageElement = document.createElement('img');
+                imageElement.src = imageSrc;
+                imageElement.className = "current_pic";
+                imageElement.style.width = "540px"; 
+                imageElement.style.height = "400px"; 
+                picture_container.appendChild(imageElement);
+                //新增圖片中下點點的icon
+                let circleElement = document.createElement('img');
+                circleElement.src= "../static/white.png";
+                circleElement.className="circle_pic";
+                circle.appendChild(circleElement);
+                //新增黑色點點的icon
+                let blackElement = document.createElement('img');
+                blackElement.src= "../static/black.png";
+                blackElement.className="circle_pic_black";
+                circle.appendChild(blackElement);
+            });
+
+            //新增完照片，監聽左右按鈕
+            let leftbtn = document.querySelector(".pic_left_btn");
+            let rightbtn = document.querySelector(".pic_right_btn");
+            let phcontainer = document.querySelector(".current_pic_container");
+            let currentImageIndex = 0;
+            //取得照片的寬度
+            let scrollamount = document.getElementsByClassName("picture_current")[0].clientWidth;
+            let indeximages= document.getElementsByClassName("circle_pic_black");
+            let indeximg= indeximages[currentImageIndex];
+            console.log(indeximages.length)
+            indeximg.style.zIndex=3;
+            leftbtn.addEventListener("click",()=>{
+                phcontainer.scrollLeft -= scrollamount;
+                if (currentImageIndex>0){
+                    indeximg.style.zIndex=1;
+                    currentImageIndex-=1;
+                    indeximg= document.getElementsByClassName("circle_pic_black")[currentImageIndex];
+                    indeximg.style.zIndex=3;
+                }
+            });
+
+            rightbtn.addEventListener("click",()=>{
+                phcontainer.scrollLeft += scrollamount;
+                if (currentImageIndex<indeximages.length-1){
+                    indeximg.style.zIndex=1;
+                    currentImageIndex+=1;
+                    indeximg= document.getElementsByClassName("circle_pic_black")[currentImageIndex];
+                    indeximg.style.zIndex=3;
+                }
+            });
+
+            //選擇上半天、下半天監聽按鈕
+            let radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach((radioButton) => {
+                radioButton.addEventListener('change', () => {
+                    let selectedPrice = radioButton.getAttribute('data-price');
+                    let guidePriceElement = document.querySelector('.guide_price');
+                    guidePriceElement.textContent = `新台幣${selectedPrice}元`;
+                });            
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    } else {
+        console.error('Attraction ID not found in URL');
+    }
+}
+
+    window.onload = function(){
+        load_attraction_details();
+        firstload=true;
+    };
+
+
+</script>
+</body>
+
+</html>

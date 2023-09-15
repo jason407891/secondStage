@@ -33,6 +33,8 @@
     display:flex;
     font: 30px "Noto Sans TC";
     font-weight: 700;
+    text-decoration: none;
+    color: inherit;
 }
 
 .signin{
@@ -286,7 +288,316 @@
     color:#FFFFFF;
 }
 
+.divider{
+    border: 1px solid #E8E8E8;
+    width:1200px;
+    margin-bottom: 40px;
 
+}
+.attraction_section{
+    width:100%;
+    height:auto;
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+}
+.section{
+    width:1200px;
+    height: 400px;
+    display:flex;
+    margin-bottom: 40px;
+}
+.pic_left_btn{
+    z-index: 300;
+    width: 36px;
+    height: 36px;
+    position: relative;
+    left:10px;
+
+}
+.pic_right_btn{
+    z-index: 300;
+    width: 36px;
+    height: 36px;
+    position: relative;
+    left:458px;
+}
+.pic_circle_btn{
+    width:540px;
+    height:12px;
+}
+.picture_current{
+    position: relative;
+    width:540px;
+    height: 400px;
+}
+
+.changebtn{
+    display:flex;
+    align-items: center;
+    position:absolute;
+    top:182px;
+}
+.current_pic_container{
+    display:flex;
+    overflow: hidden;
+    width:540px;
+    height:400px;
+}
+
+.current_pic{
+    min-width:100% !important;
+    object-fit: cover;
+    object-position: center;
+}
+
+.pic_circle_btn{
+    position: relative;
+    top: 378px;
+    width:540px;
+    display:flex;
+    justify-content: center;
+}
+.profile{
+    width:600px;
+    height:400px;
+    margin-left: 30px;
+}
+.attraction_title{
+    width:600px;
+    height:33px;
+    font: 24px "Noto Sans TC";
+    color: #666666;
+    font-weight: 700;
+    margin-bottom:15px;
+}
+.attraction_location{
+    width:600px;
+    height: 22px;
+    font: 16px "Noto Sans TC";
+    color: #666666;
+    font-weight: 400;
+    margin-bottom:15px;
+}
+.booking_form{
+    padding-top: 15px;
+    padding-left: 20px;
+    width:600px;
+    height: 302px;
+    background-color:#E8E8E8;
+}
+.booking_text{
+    display:flex;
+    margin-bottom:15px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    width:560px;
+    height: 22px;
+    color: #666666;
+}
+.booking_description{
+    width:560px;
+    height:24px;
+    margin-bottom:15px;
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+    color: #666666;
+}
+.select_date_text{
+    width:81px;
+    height: 17px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    color: #666666;
+}
+.select_date_input{
+    width: 193px;
+    height: 35px;
+    border: none;
+}
+.field_date{
+    display:flex;
+    width: 560px;
+    height: 35px;
+    align-items: center;
+    margin-bottom:15px;
+
+}
+.field_time{
+    display:flex;
+    width: 560px;
+    height: 22px;
+    margin-bottom:15px;
+}
+.field_price{
+    width:560px;
+    height: 22px;
+    display: flex;
+    margin-bottom:15px;
+}
+.select_time_text{
+    width: 81px;
+    height: 17px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    color: #666666;
+}
+.guide_fee{
+    width: 81px;
+    height: 22px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    color: #666666;
+}
+.guide_price{
+    width: 108px;
+    height: 14px;
+    font-weight: 500;
+    font: 16px "Noto Sans TC";
+    color: #666666;
+}
+.booking_button{
+    background-color: #448899;
+    display:flex;
+    width: 154px;
+    height: 36px;
+    color: white;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    font: 19px "Noto Sans TC";
+    font-weight: 400;
+}
+
+.seperate{
+    width:1200px;
+}
+
+.infors{
+    width: 1200px;
+    padding: 10px;
+}
+.info_description{
+    width: 1180px;
+    height: auto;
+    font: 16px "Noto Sans TC";
+    font-weight: 400;
+    color: #666666;
+    margin-bottom:20px;
+}
+.info_address{
+    width:1180px;
+    height: 32px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    color: #666666;
+    display:flex;
+    align-items: center;
+}
+.address_detail{
+    width: 1180px;
+    height: 24px;
+    font: 16px "Noto Sans TC";
+    font-weight: 400;
+    color: #666666;
+    display:flex;
+    align-items: center;
+    margin-bottom:20px;
+}
+
+.info_direction{
+    width:1180px;
+    height: 32px;
+    font: 16px "Noto Sans TC";
+    font-weight: 700;
+    color: #666666;
+}
+.direction_detail{
+    width:1180px;
+    height: auto;
+    font: 16px "Noto Sans TC";
+    font-weight: 400;
+    color: #666666;
+
+}
+
+.attfooter{
+    display:flex;
+    width: 100%;
+    height: 104px;
+    background-color: gray;
+    justify-content: center;
+    align-items: center;
+}
+.circle_pic{
+    margin-right: 3px;
+    margin-left: 3px;
+    z-index: 2;
+}
+
+.circle_pic_black{
+    z-index: 1;
+    right:15px;
+    position:relative;
+}
+
+/* 調整RADIO外觀 */
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"] + label {
+    position: relative;
+    padding-left: 24px;
+    cursor: pointer;
+}
+
+input[type="radio"] + label:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px; 
+    height: 18px; 
+    border: 2px solid white; 
+    border-radius: 50%; 
+    background-color: white;
+}
+
+input[type="radio"]:checked + label:before {
+    background-color: #448899; 
+}
+.label_night{
+    margin-left: 10px;
+    color: #666666;
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+}
+.label_day{
+    margin-left: 10px;
+    color: #666666;
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+}
+
+
+/* 設定日期ICON的樣式 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    font-size: 24px;  /*文字大小，根據需要調整數值 */
+}
+
+/* 設定日期顯示區域的樣式 */
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
+.loadmore{
+    height:10px;
+}
 @media(max-width:1200px){
     .navigation{
         width:360px;
@@ -307,6 +618,93 @@
     }
     .attraction{
         width:30%;
+    }
+    .section{
+        width:100%;
+        display:flex;
+        flex:auto;
+        height: auto;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .picture_current{
+        width:360px;
+        height:auto;
+    }
+    .pic_circle_btn{
+        width:100%;
+    }
+    .pic_left_btn{
+        left: 10px;
+    }
+    .pic_right_btn{
+        left: 280px;
+    }
+    .current_pic_container{
+        width:100%;
+    }
+    .current_pic{
+        width:100%;
+        
+    }
+    .profile{
+        width:360px;
+        height:auto;
+        display:flex;
+        flex-direction: column;
+        flex-wrap:auto;
+        margin: 0px;
+    }
+    .attraction_title{
+        width:100%;
+    }
+    .attraction_location{
+        width:100%;
+    }
+    .booking_form{
+        width:340px;
+    }
+    .booking_text{
+        width:100%;
+    }
+    .booking_description{
+        width:100%;
+    }
+    .field_date{
+        width:100%;
+    }
+    .field_time{
+        width:100%;
+    }
+    .divider{
+        width:100%;
+    }
+    .info_description{
+        width:340px;
+        height: auto;
+        display:flex;
+        flex-wrap: wrap;
+        text-align: start;
+    }
+    .infors{
+        width:340px;
+        height: auto;
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        
+    }
+    .info_address{
+        width:340px;
+    }
+    .address_detail{
+        width:340px;
+    }
+    .info_direction{
+        width:340px;
+    }
+    .direction_detail{
+        width:340px;
     }
 
 }
@@ -434,4 +832,31 @@
     .footer{
         display:none;
     }
+    /*attraction頁面*/
+    .divider{
+        margin: 0px;
+    }
+    .picture_current{
+        height: 350px;
+    }
+    .current_pic_container{
+        height: 350px;
+    }
+    .current_pic{
+        height: 350px;
+    }
+    .pic_circle_btn{
+        top:330px;
+        right:30px;
+    }
+    .attraction_title{
+        margin-top:20px;
+    }
+    .profile{
+        width:340px;
+    }
+    .infors{
+        margin-top:50px;
+    }
+
 }
