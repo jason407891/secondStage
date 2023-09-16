@@ -17,6 +17,12 @@
     z-index: 2;
     background-color: white;
 }
+.divider_top{
+    width:100%;
+    height:1px;
+    background-color: #E8E8E8;
+}
+
 .navigation{
     display:flex;
     height:34px;
@@ -289,10 +295,11 @@
 }
 
 .divider{
-    border: 1px solid #E8E8E8;
+    height:1px;
     width:1200px;
+    background-color: #E8E8E8;
     margin-bottom: 40px;
-
+    border:0px;
 }
 .attraction_section{
     width:100%;
@@ -308,6 +315,8 @@
     height: 400px;
     display:flex;
     margin-bottom: 40px;
+    margin-top:40px;
+
 }
 .pic_left_btn{
     z-index: 300;
@@ -342,9 +351,11 @@
 }
 .current_pic_container{
     display:flex;
+    position:absolute;
     overflow: hidden;
     width:540px;
-    height:400px;
+    height:100%;
+    bottom:1px;
 }
 
 .current_pic{
@@ -623,9 +634,9 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
         width:100%;
         display:flex;
         flex:auto;
-        height: auto;
         flex-wrap: wrap;
         justify-content: center;
+        margin-top:0px;
     }
     .picture_current{
         width:360px;
@@ -674,6 +685,9 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
         width:100%;
     }
     .field_time{
+        width:100%;
+    }
+    .field_price{
         width:100%;
     }
     .divider{
@@ -856,7 +870,17 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
         width:340px;
     }
     .infors{
-        margin-top:50px;
+        margin-top:40px;
     }
+    .pic_right_btn{
+        left:260px;
+    }
+    .section{
+        height:auto;
+    }
+    .attfooter{
+        margin-top:40px;
+    }
+
 
 }
