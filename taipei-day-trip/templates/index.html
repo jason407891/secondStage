@@ -9,7 +9,7 @@
 <body class="body">
     <div class="navigation_title">
         <div class="navigation">
-            <div class="taipei_title">台北一日遊</div>
+            <a  href="/" class="taipei_title">台北一日遊</a>
             <div class="signin">
                 <div class="navbtn">預定行程</div>
                 <div class="navbtn">登入/註冊</div>
@@ -74,24 +74,23 @@
                           -->
             </div>
         </div>
-        </div>
-        <div class="footer">
-            <div class="copyright">COPYRIGHT@2021台北一日遊</div>
-        </div>
-        <div class="loadmore"></div>
     </div>
-
+    <div class="footer">
+            <div class="copyright">COPYRIGHT@2021台北一日遊</div>
+    </div>
+    <div class="loadmore"></div>
 
     <script>
     let nextpage=1 //一開始nextpage是1
     function get_attraction(page_num, keyword){
-        if (nextpage !== null){
-            observer.unobserve(footElement);
+        if (nextpage == null){
+        observer.unobserve(footElement);
+        console.log("stop load more");}
         //觸發fetch請求來取得api/attractions
         let url = '/api/attractions?page='+page_num;
         if(keyword){
             url += '&keyword=' + keyword;
-        }
+            };
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -101,13 +100,20 @@
             })
             .then(data => {
                 let attractionsGroup = document.querySelector('.attractions_group');
-                if (nextpage!=""){
+                if (data.nextPage!=null){
                     nextpage=data.nextPage;
                 }
-                else{return;}
+                else{
+                    console.log("next page data is empty");
+                    nextpage=null;
+                    return;}
                 data.data.forEach(attraction => {
                     let attractionElement = document.createElement('div');
                     attractionElement.classList.add('attraction');
+                    attractionElement.onclick=function(){
+                        //HTML DOM處理跳轉功能
+                        window.location.href = `/attraction/${attraction.id}`;
+                    };
                     attractionElement.innerHTML = `
                         <div class="detail1">
                             <div class="mrt_detail">
@@ -127,7 +133,7 @@
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
-            });}}
+            });}
 
 
     function get_mrt(){
@@ -222,6 +228,10 @@
                 data.data.forEach(attraction => {
                 let attractionElement = document.createElement('div');
                 attractionElement.classList.add('attraction');
+                attractionElement.onclick=function(){
+                        //HTML DOM處理跳轉功能
+                        window.location.href = `/attraction/${attraction.id}`;
+                    };
                 attractionElement.innerHTML = `
                     <div class="detail1">
                         <div class="mrt_detail">
@@ -255,13 +265,12 @@
         get_attraction(0);
         setTimeout(function () {
             get_mrt();
-            }, 50);} // time.sleep 0.01 seconds
+            }, 500);} // time.sleep 0.01 seconds
         firstload=false;
     };
 
     //自動載入下一頁的資訊
     let footElement = document.querySelector('.loadmore');
-
     let option={
         root: null,
         rootMargin: "0px",
@@ -270,33 +279,13 @@
     let observer = new IntersectionObserver((entries)=>{
         entries.forEach((entry)=>{
             if(entry.isIntersecting){
+                observer.unobserve(footElement);
                 let input_name=document.querySelector(".inputname");
-                console.log(input_name);
                 let keyword = input_name.value;
-                if (keyword){
-                    console.log("66666");
-                    get_attraction(nextpage,keyword);
-                }
-                else{
-                    get_attraction(nextpage);
-                }
-
-                /*
-                if (nextpage==null){   //max_page=5
-                    console.log("no more data");
-                    console.log(nextpage);
-                }
-                else{
-                    let key_word = document.querySelector('.inputname').value;
-                    get_attraction(nextpage,key_word);
-                }
-                */
-            //observer.unobserve(entry.target);
-            }
-        });
+                get_attraction(nextpage, keyword);
+        }
+    });
     }, option);
-    observer.observe(footElement);
-    //observer.unobserve(footElement);}
 
 
     //如果搜尋按鈕被點擊，就要去搜尋關鍵字
