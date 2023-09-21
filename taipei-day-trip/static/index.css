@@ -595,7 +595,131 @@ input[type="radio"]:checked + label:before {
     font: 16px "Noto Sans TC";
     font-weight: 500;
 }
+.signup_block{
+    width:100%;
+    display:flex;
+    justify-content: center;
+    position:absolute;
+    top:80px;
+    display:none;
 
+     /* 先把註冊表單隱藏起來 */
+}
+.login_block{
+    width:100%;
+    display:flex;
+    justify-content: center;
+    position:absolute;
+    top:80px;
+     /* 先把登入表單隱藏起來 */
+    display:none;
+}
+
+
+.deco_bar{
+    width:340px;
+    height: 10px;
+    background-image:linear-gradient(to right,#66AABB,#337788);
+}
+.signup{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width:340px;
+    height: 332px;
+    position:absolute;
+    background-color: white;
+    z-index:350;
+}
+.login{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width:340px;
+    height: 275px;
+    position:absolute;
+    background-color: white;
+    z-index:350;
+}
+.signup_text{
+    text-align: center;
+    width:310px;
+    height: 27px;
+    margin-top: 7px;
+    font: 24px "Noto Sans TC";
+    color: #666666;
+    font-weight: 700;
+}
+.login_text{
+    text-align: center;
+    width:310px;
+    height: 27px;
+    margin-top: 7px;
+    font: 24px "Noto Sans TC";
+    color: #666666;
+    font-weight: 700;
+}
+.close_button{
+    position:absolute;
+    width:30px;
+    height: 30px;
+    left:300px;
+    top:10px;
+}
+.register_input{
+    width:310px;
+    height: 47px;
+    border-radius: 5px;
+    border: 1px solid #CCCCCC;
+    margin-top:10px;
+}
+.login_input{
+    width:310px;
+    height: 47px;
+    border-radius: 5px;
+    border: 1px solid #CCCCCC;
+    margin-top:10px;
+}
+.register_input::placeholder{
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+    color:#757575;
+    top:15px;
+    left:15px;
+}
+.submit_btn{
+    width:310px;
+    height: 47px;
+    margin-top:10px;
+    font: 19px "Noto Sans TC";
+    border-radius: 5px;
+    border: none;
+    background-color: #448899;
+    color:white;
+    text-align: center;
+}
+.login_link{
+    width:310px;
+    height:22px;
+    text-align: center;
+    margin-top:10px;
+    margin-bottom:20px;
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+    color: #666666;
+}
+.signup_link{
+    width:310px;
+    height:22px;
+    text-align: center;
+    margin-top:10px;
+    margin-bottom:20px;
+    font: 16px "Noto Sans TC";
+    font-weight: 500;
+    color: #666666;
+}
 
 /* 設定日期ICON的樣式 */
 input[type="date"]::-webkit-calendar-picker-indicator {

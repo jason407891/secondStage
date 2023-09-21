@@ -2,6 +2,8 @@
 
 from flask import *
 import mysql.connector
+import jwt
+from jwt.exceptions import DecodeError
 
 
 
@@ -11,6 +13,8 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = False
 app.config["JSONIFY_MIMETYPE"] = 'application/json; charset=utf-8'
 app.config ['JSON_SORT_KEYS'] = False
+secret_key = "jasonkey"
+
 
 
 try:
@@ -180,6 +184,75 @@ def api_mrts():
         error_message = str(e)
         return jsonify({"error":True,
                          "message":error_message}), 500
+    
+
+#會員API
+@app.route("/api/user", methods=["POST"])
+def api_user():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        existing_user = cursor.fetchone()
+        cursor.close()
+
+        if existing_user:
+             return jsonify({"error":"Email already exist"}), 400
+        
+        cursor = db.cursor()
+        cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
+        db.commit()
+        cursor.close()
+
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        return jsonify({"error":True,"message":"Internal Error"}), 500
+     
+
+@app.route("/api/user/auth", methods=["PUT","GET"])
+def api_login():
+    if request.method == "PUT":
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        cursor = db.cursor()
+        cursor.execute("SELECT id, name, email FROM users WHERE email = %s AND password = %s", (email, password))
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user:
+            user_info = {
+                "id": user[0],
+                "name": user[1],
+                "email": user[2]
+            }
+
+            # 生成 JWT Token
+            token = jwt.encode(user_info, secret_key, algorithm="HS256")
+
+            return jsonify({"token": token})
+        else:
+            return jsonify({"error":True, "message":"帳號或是密碼輸入錯誤"}), 400
+    elif request.method == "GET":
+        token = request.headers.get("Authorization")
+        if token=="null":
+            return jsonify({"error":True,"message":"user not login"}), 200
+        try:
+            user_info = jwt.decode(token, secret_key, algorithms=["HS256"])
+            return jsonify({"data": user_info})
+        except DecodeError as e:
+            return jsonify({"error":True,"message":str(e)}), 500
+
+
+
+    
+     
+     
+     
+
 
 
 
