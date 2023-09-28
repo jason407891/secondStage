@@ -154,5 +154,17 @@ function logout(){
     logout_member.id="logstatus";
     logout_member.onclick=sign_in;
     localStorage.setItem("token", null);
-    window.location.reload();
+    setTimeout(function(){window.location.reload()},100)
+}
+
+
+function schedule_page(){
+    let token = localStorage.getItem("token");
+    console.log(token);
+    if (token == "null"){
+        sign_in();
+    }
+    else{
+        window.location.href="/booking";
+    }
 }

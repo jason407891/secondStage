@@ -1,0 +1,286 @@
+<!DOCTYPE html> <!--文件型態-->
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁標題</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}"/>
+    <meta charset="utf-8">
+</head>
+<body class="body">
+    <div class="navigation_title">
+        <div class="navigation">
+            <a  href="/" class="taipei_title">台北一日遊</a>
+            <div class="signin">
+                <div class="navbtn" onclick="schedule_page()">預定行程</div>
+                <div class="navbtn" id="logstatus" onclick="sign_in()">登入/註冊</div>
+            </div>
+        </div>
+    </div>
+    <div class="divider_top"></div>
+    <div class="booking_main">
+    <!--
+    <div class="headline_container">
+        <div class="headline">您好，JASON，待預定的行程如下</div>
+    </div>
+    <div class="booking_section">
+        <img src="../static/delete.png" class="delete_btn"></img>
+        <img src="../static/welcome.png" class="section_pic"></img>
+        <div class="section_info">
+            <div class="section_title">台北一日遊:平安鐘</div>
+            <div class="section_name">日期：<span class="section_content">2021-04-23</span></div>
+            <div class="section_name">時間：<span class="section_content">早上9點到下午4點</span></div>
+            <div class="section_name">費用：<span class="section_content">新台幣2000元</span></div>
+            <div class="section_name">地點：<span class="section_content">台北市</span></div>
+        </div>
+    </div>
+    <hr class="divider">
+    <div class="booking_container">
+        <div class="contact_form">
+            <div class="contact_title">您的聯絡資訊</div>
+            <div class="contact_field">
+                <span class="contact_text">聯絡姓名：</span><input class="contact_content"></input><br>
+            </div>
+            <div class="contact_field">
+                <span class="contact_text">聯絡信箱：</span><input class="contact_content"></input><br>
+            </div>
+            <div class="contact_field">
+                <span class="contact_text">手機號碼：</span><input class="contact_content"></input><br>
+            </div>
+            <div class="contact_notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+        </div>
+    </div>
+    <hr class="divider">
+    <div class="booking_container">
+        <div class="payment">           
+            <div class="contact_title">信用卡付款資訊</div>
+            <div class="contact_field">
+                <span class="contact_text">卡片號碼：</span><input placeholder=" **** **** **** ****" class="contact_content"></input><br>
+            </div>
+            <div class="contact_field">
+                <span class="contact_text">過期時間：</span><input placeholder=" MM / YY" class="contact_content"></input><br>
+            </div>
+            <div class="contact_field">
+                <span class="contact_text">驗證密碼：</span><input placeholder=" CVV" class="contact_content"></input><br>
+            </div>
+        </div>
+    </div>
+    <hr class="divider">
+    <div class="confirm_container">
+        <div class="confirm">
+            <div class="confirm_text">總價：新台幣2000元</div>
+            <div class="confirm_btn">確認訂購並付款</div>
+        </div>
+    </div>
+    
+    </div>
+    <div class="attfooter">
+        <div class="copyright">COPYRIGHT@2021台北一日遊</div>
+    </div>
+    -->
+
+        <!--註冊帳號的表單-->
+        <div class="signup_block">
+            <form class="signup">
+                <div class="deco_bar"></div>
+                <div class="signup_text">註冊會員帳號</div>
+                <img src="../static/close.png" class="close_button" onclick="close_form()"></img>
+                <input class="register_input" name="name" placeholder="輸入姓名"></input>
+                <input class="register_input" name="email" placeholder="輸入電子郵件"></input>
+                <input class="register_input" name="password" placeholder="輸入密碼" type="password"></input>
+                <input class="submit_btn" onclick="register_user()" value="註冊新帳戶"></input>
+                <div class="signup_link"><span id="have_account">已經有帳戶了？</span><span onclick="sign_in()">點此登入</span></div>
+        </form>
+        </div>
+        
+            <!--登入會員的表單-->
+            <div class="login_block">
+                <div class="login">
+                    <div class="deco_bar"></div>
+                    <div class="login_text">登入會員帳號</div>
+                    <img src="../static/close.png" class="close_button" onclick="close_form()"></img>
+                    <input class="login_input" placeholder="輸入電子信箱"></input>
+                    <input class="login_input" placeholder="輸入密碼" type="password"></input>
+                    <input class="submit_btn" onclick="login()" value="登入帳戶"></input>
+                    <div class="login_link">還沒有帳戶？<span onclick="register()">點此註冊</span></div>
+                </div>
+            </div>
+ 
+<script src="{{url_for('static', filename='login.js') }}"></script>
+
+<script>
+    function get_schedule(){
+        let token = localStorage.getItem("token");
+
+        fetch("api/booking",{
+        method: "GET",
+        headers:{
+            "Authorization": token,
+            "Content-Type": "application/json"
+        }
+        })
+        .then(response=>{
+                if(response.status===403){
+                    console.log("user not login");
+                };
+                return response.json();
+        })
+        .then(data=>{
+            if(data.data=="null"){
+                console.log("nodata");
+                let mainElement=document.querySelector(".booking_main");
+                mainElement.innerHTML=`
+                <div class="booking_main">
+                    <div class="headline_container">
+                    <div class="headline"></div>
+                    </div>
+                </div>
+                <div class="noschedule_container">
+                    <div class="no_schedule">目前沒有任何待預定的行程</div>
+                </div>
+                <div class="noschedule_attfooter">
+                <div class="noschedule_copyright">COPYRIGHT@2021台北一日遊</div>
+                </div>
+            `;
+            }
+            else{
+            let attraction = data.data.attraction;
+            let id = attraction["id"];
+            let name= attraction["name"];
+            let address = attraction["address"];
+            let image = attraction["image"];
+            let date = data.data.date;
+            let time = data.data.time;
+            if(time=="day"){time="上午9:00到下午4:00";}
+            else{time="下午4:00到晚上10:00";}
+            let price = data.data.price;
+            let mainElement=document.querySelector(".booking_main");
+            mainElement.innerHTML=`
+            <div class="booking_main">
+            <div class="headline_container">
+                <div class="headline">您好，JASON，待預定的行程如下</div>
+            </div>
+            <div class="bookingsection_container">
+                <div class="booking_section">
+                    <img src="../static/delete.png" class="delete_btn" onclick="delete_schedule()"></img>
+                    <img src=${image} class="section_pic"></img>
+                    <div class="section_info">
+                        <div class="section_title">${name}</div>
+                        <div class="section_name">日期：<span class="section_content">${date}</span></div>
+                        <div class="section_name">時間：<span class="section_content">${time}</span></div>
+                        <div class="section_name">費用：<span class="section_content">${price}</span></div>
+                        <div class="section_name">地點：<span class="section_content">${address}</span></div>
+                    </div>
+                </div>
+            </div>
+            <hr class="divider">
+            <div class="booking_container">
+                <div class="contact_form">
+                    <div class="contact_title">您的聯絡資訊</div>
+                    <div class="contact_field">
+                        <span class="contact_text">聯絡姓名：</span><input class="contact_content"></input><br>
+                    </div>
+                    <div class="contact_field">
+                        <span class="contact_text">聯絡信箱：</span><input class="contact_content"></input><br>
+                    </div>
+                    <div class="contact_field">
+                        <span class="contact_text">手機號碼：</span><input class="contact_content"></input><br>
+                    </div>
+                    <div class="contact_notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+                </div>
+            </div>
+            <hr class="divider">
+            <div class="booking_container">
+                <div class="payment">           
+                    <div class="contact_title">信用卡付款資訊</div>
+                    <div class="contact_field">
+                        <span class="contact_text">卡片號碼：</span><input placeholder=" **** **** **** ****" class="contact_content"></input><br>
+                    </div>
+                    <div class="contact_field">
+                        <span class="contact_text">過期時間：</span><input placeholder=" MM / YY" class="contact_content"></input><br>
+                    </div>
+                    <div class="contact_field">
+                        <span class="contact_text">驗證密碼：</span><input placeholder=" CVV" class="contact_content"></input><br>
+                    </div>
+                </div>
+            </div>
+            <hr class="divider">
+            <div class="confirm_container">
+                <div class="confirm">
+                    <div class="confirm_text">總價：新台幣${price}元</div>
+                    <div class="confirm_btn">確認訂購並付款</div>
+                </div>
+            </div>
+            </div>
+            <div class="attfooter">
+            <div class="copyright">COPYRIGHT@2021台北一日遊</div>
+            </div>
+            
+            `;} 
+        })
+    };
+    function showname(){
+    let token = localStorage.getItem("token");
+    let headers = new Headers({
+        "Authorization": token,
+        "Content-Type": "application/json"
+    });
+    fetch("/api/user/auth", {
+        method: "GET",
+        headers: headers
+    })
+    .then(response=>response.json())
+    .then(data=>{
+        if (data.error){
+            window.location.href="/";
+        }
+        else{
+            name=data.data["name"];
+            let display_name=document.querySelector(".headline");
+            display_name.innerHTML=`
+            您好，${name}，待預定的行程如下：
+            `;
+            }
+        }
+    )
+    .catch(()=>{
+        console.log("發生錯誤");
+    })
+}
+
+
+    function delete_schedule(){
+        let token = localStorage.getItem("token");
+        fetch("api/booking",{
+        method: "DELETE",
+        headers:{
+            "Authorization": token,
+            "Content-Type": "application/json"
+        }
+        })
+        .then(response=>{return response.json()})
+        .then(data=>{
+            if (data.ok){
+                console.log("delete schedule!");
+                setTimeout(function(){window.location.reload();},300);
+            }
+            else{
+                console.log("something wrong")
+            }
+
+        })
+
+
+    }
+
+
+    window.onload =  function () {
+    checkstatus();
+    setTimeout(function(){get_schedule()},300);
+    setTimeout(function(){showname()},500);
+    }
+    
+
+</script>
+</body>
+
+</html>
