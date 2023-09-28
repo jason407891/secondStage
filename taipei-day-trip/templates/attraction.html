@@ -11,8 +11,8 @@
         <div class="navigation">
             <a  href="/" class="taipei_title">台北一日遊</a>
             <div class="signin">
-                <div class="navbtn">預定行程</div>
-                <div class="navbtn">登入/註冊</div>
+                <div class="navbtn" onclick="schedule_page()">預定行程</div>
+                <div class="navbtn" id="logstatus" onclick="sign_in()">登入/註冊</div>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
                         <div class="guide_fee">導覽費用：</div>
                         <div class="guide_price">新台幣2000元</div>
                     </div>
-                    <div class="booking_button">開始預約行程</div>
+                    <div class="booking_button" onclick="booking_schedule()">開始預約行程</div>
                 </div>
             </div>
 
@@ -64,7 +64,34 @@
         <div class="copyright">COPYRIGHT@2021台北一日遊</div>
     </div>
 
+    <!--註冊帳號的表單-->
+    <div class="signup_block">
+    <form class="signup">
+        <div class="deco_bar"></div>
+        <div class="signup_text">註冊會員帳號</div>
+        <img src="../static/close.png" class="close_button" onclick="close_form()"></img>
+        <input class="register_input" name="name" placeholder="輸入姓名"></input>
+        <input class="register_input" name="email" placeholder="輸入電子郵件"></input>
+        <input class="register_input" name="password" placeholder="輸入密碼" type="password"></input>
+        <input class="submit_btn" onclick="register_user()" value="註冊新帳戶"></input>
+        <div class="signup_link"><span id="have_account">已經有帳戶了？</span><span onclick="sign_in()">點此登入</span></div>
+    </form>
+    </div>
 
+    <!--登入會員的表單-->
+    <div class="login_block">
+        <div class="login">
+            <div class="deco_bar"></div>
+            <div class="login_text">登入會員帳號</div>
+            <img src="../static/close.png" class="close_button" onclick="close_form()"></img>
+            <input class="login_input" placeholder="輸入電子信箱"></input>
+            <input class="login_input" placeholder="輸入密碼" type="password"></input>
+            <input class="submit_btn" onclick="login()" value="登入帳戶"></input>
+            <div class="login_link">還沒有帳戶？<span onclick="register()">點此註冊</span></div>
+        </div>
+        </div>
+
+<script src="{{url_for('static', filename='login.js') }}"></script>
 <script>
     function get_attraction_detail(id){
         return fetch(`/api/attraction/${id}`)
@@ -75,7 +102,6 @@
             return response.json();
         });
     }
-
 
     async function load_attraction_details() {
     let currentPath = window.location.pathname;
@@ -110,14 +136,14 @@
                             <div class="select_time_text">選擇時間：</div>
                             <input type="radio" name="time" id="day" value="day" class="select_time_input" data-price="2000">
                             <label for="day" class="label_day">上半天</label>
-                            <input type="radio" name="time" id="night" value="night" class="select_time_input" data-price="2500">
-                            <label class="label_night" for="night">下半天</label>
+                            <input type="radio" name="time" id="afternoon" value="afternoon" class="select_time_input" data-price="2500">
+                            <label class="label_afternoon" for="afternoon">下半天</label>
                         </div>
                         <div class="field_price">
                             <div class="guide_fee">導覽費用：</div>
                             <div class="guide_price"></div>
                         </div>
-                        <div class="booking_button">開始預約行程</div>
+                        <div class="booking_button" onclick="booking_schedule()">開始預約行程</div>
                     </div>
                 </div>
 
@@ -161,7 +187,6 @@
             let scrollamount = document.getElementsByClassName("picture_current")[0].clientWidth;
             let indeximages= document.getElementsByClassName("circle_pic_black");
             let indeximg= indeximages[currentImageIndex];
-            console.log(indeximages.length)
             indeximg.style.zIndex=3;
             leftbtn.addEventListener("click",()=>{
                 phcontainer.scrollLeft -= scrollamount;
@@ -200,10 +225,57 @@
     }
 }
 
+
+    function booking_schedule(){
+        let token = localStorage.getItem("token");
+        let date = document.querySelector(".select_date_input").value;
+        let radioButton = document.querySelector('input[name="time"]:checked');
+        let time = radioButton.value;
+        let price = radioButton.getAttribute("data-price");
+        console.log(date,time,price);
+        //取得attractionid
+        let url = window.location.href;
+        let part = url.split("/");
+        let arractionid = part[part.length-1];
+        fetch("/api/booking",{
+            method: "POST",
+            headers: {
+                "Authorization": token,
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({
+                "attractionId":  arractionid,
+                "date": date,
+                "time": time,
+                "price": price
+            })
+        })
+        .then(response=>response.json())
+        .then(data=>{
+            if(data.ok){
+                window.location.href="/booking";
+            }
+            if(data.error){
+                console.log(data.message);
+                sign_in();
+            }
+        })
+        .catch(error=>{
+            console.log("something error")
+            sign_in();
+
+        });
+    };
+
+
     window.onload = function(){
         load_attraction_details();
         firstload=true;
+        setTimeout(checkstatus(),1000)
     };
+
+
+
 
 
 </script>

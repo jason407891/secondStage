@@ -2,7 +2,9 @@
 
 from flask import *
 import mysql.connector
-
+import jwt
+from jwt.exceptions import DecodeError
+from datetime import datetime
 
 
 app=Flask(__name__)
@@ -11,6 +13,8 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = False
 app.config["JSONIFY_MIMETYPE"] = 'application/json; charset=utf-8'
 app.config ['JSON_SORT_KEYS'] = False
+secret_key = "jasonkey"
+
 
 
 try:
@@ -180,6 +184,160 @@ def api_mrts():
         error_message = str(e)
         return jsonify({"error":True,
                          "message":error_message}), 500
+    
+
+#會員API
+@app.route("/api/user", methods=["POST"])
+def api_user():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        existing_user = cursor.fetchone()
+        cursor.close()
+
+        if existing_user:
+             return jsonify({"error":"Email already exist"}), 400
+        
+        cursor = db.cursor()
+        cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
+        db.commit()
+        cursor.close()
+
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        return jsonify({"error":True,"message":"Internal Error"}), 500
+     
+
+@app.route("/api/user/auth", methods=["PUT","GET"])
+def api_login():
+    if request.method == "PUT":
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        cursor = db.cursor()
+        cursor.execute("SELECT id, name, email FROM users WHERE email = %s AND password = %s", (email, password))
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user:
+            user_info = {
+                "id": user[0],
+                "name": user[1],
+                "email": user[2]
+            }
+
+            # 生成 JWT Token
+            token = jwt.encode(user_info, secret_key, algorithm="HS256")
+
+            return jsonify({"token": token})
+        else:
+            return jsonify({"error":True, "message":"帳號或是密碼輸入錯誤"}), 400
+    elif request.method == "GET":
+        token = request.headers.get("Authorization")
+        if token=="null":
+            return jsonify({"error":True,"message":"user not login"}), 200
+        try:
+            user_info = jwt.decode(token, secret_key, algorithms=["HS256"])
+            return jsonify({"data": user_info})
+        except DecodeError as e:
+            return jsonify({"error":True,"message":str(e)}), 500
+
+
+
+#預定行程 booking API
+
+@app.route("/api/booking", methods=["GET","POST","DELETE"])
+def api_booking():
+    token = str(request.headers.get("Authorization"))
+    #拿到userid
+    try:
+        user_info = jwt.decode(token, secret_key, algorithms=["HS256"])
+        user_id=user_info.get("id")
+    except Exception as e:
+        print("user not login",e)
+    if token == "null":
+        return jsonify({"error":True,"message":"Please login first"}),403
+    if request.method == "GET":
+        try:
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT s.attractionId, s.date, s.time, s.price, a.name, a.address, a.files
+                FROM schedules s
+                JOIN attractions a ON s.attractionId = a.id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            schedule_info = cursor.fetchone()
+            cursor.close()
+            if schedule_info is None:
+                return jsonify({"data":"null"})
+            else:
+                image_list = schedule_info[6].strip('[]').replace('"', '').split(', ')
+                correct_date = schedule_info[1].strftime("%Y-%m-%d")
+
+                responsedata={
+                    "data":{
+                        "attraction":{
+                            "id": schedule_info[0],
+                            "name": schedule_info[4],
+                            "address": schedule_info[5],
+                            "image": image_list[0]
+                        },
+                    "date": correct_date,
+                    "time": schedule_info[2],
+                    "price": schedule_info[3]
+                    }
+                }
+                return jsonify(responsedata),200
+        except Exception as e:
+            return jsonify({"error":str(e)})
+
+    elif request.method == "POST":
+        try:
+            data=request.get_json()
+            attractionId=data.get("attractionId")
+            date=data.get("date")
+            time=data.get("time")
+            price=data.get("price")
+            cursor = db.cursor()
+
+            #判斷要新增還是更改行程
+            cursor.execute("SELECT COUNT(*) FROM schedules WHERE user_id = %s", (user_id,))
+            count=cursor.fetchone()[0]
+            if count ==0:
+                cursor.execute("INSERT INTO schedules (user_id, attractionId, date, time, price) VALUES (%s, %s, %s, %s, %s)", (user_id, attractionId, date, time, price))
+            else:
+                cursor.execute("UPDATE schedules SET attractionId = %s, date = %s, time = %s, price = %s WHERE user_id = %s", (attractionId, date, time, price, user_id))
+            db.commit()
+            cursor.close()
+            print("已新增資料")
+            return jsonify({"ok":True})
+        except Exception as e:
+            return jsonify({"error":True,"message":str(e)})
+
+
+    elif request.method == "DELETE":
+        try:
+            cursor = db.cursor()
+            cursor.execute("DELETE FROM schedules WHERE user_id = %s", (user_id,))
+            db.commit()
+            cursor.close()
+            print(123)
+            return jsonify({"ok":True})
+        except Exception as e:
+            print(456)
+            print(e)
+            return jsonify({"error":True,"message":str(e)})
+
+     
+
+     
+     
+     
+
 
 
 
