@@ -325,10 +325,8 @@ def api_booking():
             cursor.execute("DELETE FROM schedules WHERE user_id = %s", (user_id,))
             db.commit()
             cursor.close()
-            print(123)
             return jsonify({"ok":True})
         except Exception as e:
-            print(456)
             print(e)
             return jsonify({"error":True,"message":str(e)})
 
