@@ -246,11 +246,11 @@
             })})
             .then(response=>{return response.json();})
             .then(data=>{
-                setTimeout(function(){console.log("SUCCESS TO GET ORDER")},1000);
-                let order_number = data.data.number;
-                delete_schedule();
-                window.location.href="/thankyou?number="+order_number;
-
+                setTimeout(function(){
+                    let order_number = data.data.number;
+                    delete_schedule();
+                    window.location.href="/thankyou?number="+order_number;
+                },1000);
             })        
             })}
 
