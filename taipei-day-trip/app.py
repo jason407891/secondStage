@@ -7,6 +7,7 @@ from jwt.exceptions import DecodeError
 from datetime import datetime
 import mysql.connector
 from mysql.connector import pooling
+import requests
 
 app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
@@ -150,7 +151,8 @@ def api_attraction_id(attractionId):
         response_data = {
             "data": attraction_data
         }
-        
+
+        #let response data can sort as we want
         json_data = json.dumps(response_data, ensure_ascii=False, sort_keys=False, indent=None)
         response = Response(json_data, content_type="application/json; charset=utf-8")
         
@@ -361,10 +363,155 @@ def api_booking():
         connection.close()
      
 
-     
-     
-     
 
+
+#order API
+@app.route("/api/orders", methods=["POST"])
+def api_orders():
+    connection = connection_pool.get_connection()
+    try:
+        token = str(request.headers.get("Authorization"))
+        #拿到userid
+        try:
+            user_info = jwt.decode(token, secret_key, algorithms=["HS256"])
+            user_id=user_info.get("id")
+        except Exception as e:
+            print("user not login",e)
+        if token == "null":
+            return jsonify({"error":True,"message":"Please login first"}),403
+        
+        if request.method=="POST":
+            #前端BODY裡面的資料
+            try:
+                data=request.get_json()
+                primekey=data.get("prime")
+                order=data.get("order")
+                contact=data.get("contact")
+                price=order.get("price")
+                trip=order.get("trip")
+                date=order.get("date")
+                time=order.get("time")
+                id=trip.get("id")
+                attractionName=trip.get("name")
+                address=trip.get("address")
+                image=trip.get("image")
+                name=contact.get("name")
+                email=contact.get("email")
+                phone=contact.get("phone")
+                status="unpaid"
+                timenow=datetime.now()
+                order_num=timenow.strftime("%Y%m%d%M%S")
+                order_num=order_num.replace("/","")
+                cursor = connection.cursor()
+                sql = """INSERT INTO orders (prime, price, attraction_id, attraction_name, attraction_address, attraction_image, trip_date, trip_time, contact_name, contact_email, contact_phone, payment_status, order_number)
+                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                cursor.execute(sql,(primekey,price,id,attractionName,address,image,date,time,name,email,phone,status,order_num))
+                connection.commit()
+                cursor.close()
+                print(primekey,price,id,attractionName,address,image,date,time,name,email,phone,status)
+            except Exception as e:
+                print("Request格式錯誤",e)
+                return jsonify({"error":True,"message":"訂單建立失敗"})
+            #向第三方支付打API
+            request_data={
+                "prime":primekey,
+                "partner_key":"partner_xojIhwZCO89VZF7U4KC6s1PgnR5Oek8BdHW7aHuTyztbrJKhynoPElFl",
+                "merchant_id":"jasonlin_CTBC",
+                "amount":price,
+                "details":"旅遊行程",
+                "cardholder":{
+                    "phone_number":phone,
+                    "name":name,
+                    "email":email
+                }
+            }
+            api_url="https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
+            response=requests.post(api_url,json=request_data,headers={'Content-Type': 'application/json','x-api-key':"partner_xojIhwZCO89VZF7U4KC6s1PgnR5Oek8BdHW7aHuTyztbrJKhynoPElFl"})
+            if response.status_code==200:
+                #更新資料庫狀態
+                cursor = connection.cursor()
+                cursor.execute("UPDATE orders SET payment_status='paid' WHERE order_number=%s", (order_num,))
+                connection.commit()
+                cursor.close()
+                response_data={
+                    "data":{
+                        "number":order_num,
+                        "payment":{
+                            "status":0,
+                            "message":"付款成功"
+                        }
+                    }
+                }
+                return jsonify(response_data),200
+            else:
+                print("付款失敗")
+                response_data={
+                    "data":{
+                        "number":order_num,
+                        "payment":{
+                            "status":1,
+                            "message":"付款失敗"
+                        }
+                    }
+                }
+
+                return jsonify(response_data),200
+    finally:
+        connection.close()
+     
+     
+@app.route("/api/order/<orderNumber>")
+def api_order(orderNumber):
+    connection = connection_pool.get_connection()
+    try:
+        token = str(request.headers.get("Authorization"))
+        #拿到userid
+        try:
+            user_info = jwt.decode(token, secret_key, algorithms=["HS256"])
+            user_id=user_info.get("id")
+        except Exception as e:
+            print("user not login",e)
+        if token == "null":
+            return jsonify({"error":True,"message":"Please login first"}),403
+        query_param={}
+        query = "SELECT * FROM orders WHERE order_number = %(orderNumber)s"
+        query_param["orderNumber"]=orderNumber
+        cursor = connection.cursor()
+        cursor.execute(query,query_param)
+        order_detail=cursor.fetchone()
+        cursor.close()
+        if not order_detail:
+            return jsonify({"data":"null"})
+        else:
+            response_data={
+                "data":{
+                    "number":order_detail[13],
+                    "price":order_detail[2],
+                    "trip":{
+                        "attraction":{
+                            "id":order_detail[3],
+                            "name":order_detail[4],
+                            "address":order_detail[5],
+                            "image":order_detail[6]
+                        },
+                        "date":order_detail[7],
+                        "time":order_detail[8]
+                    },
+                    "contact":{
+                        "name":order_detail[9],
+                        "email":order_detail[10],
+                        "phone":order_detail[11]
+                    },
+                    "status":1
+                }
+            }
+            print(order_detail)
+            json_data = json.dumps(response_data, ensure_ascii=False, sort_keys=False, indent=None)
+            response = Response(json_data, content_type="application/json; charset=utf-8")
+            return response
+
+    finally:
+        connection.close()
 
 
 

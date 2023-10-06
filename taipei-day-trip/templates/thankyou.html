@@ -1,0 +1,109 @@
+<!DOCTYPE html> <!--文件型態-->
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁標題</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}"/>
+    <meta charset="utf-8">
+</head>
+<body class="body">
+    <div class="navigation_title">
+        <div class="navigation">
+            <a  href="/" class="taipei_title">台北一日遊</a>
+            <div class="signin">
+                <div class="navbtn" onclick="schedule_page()">預定行程</div>
+                <div class="navbtn" id="logstatus" onclick="sign_in()">登入/註冊</div>
+            </div>
+        </div>
+    </div>
+    <div class="divider_top"></div>
+    <div class="thankyou_area">
+    <!--
+        <div class="thankyou_content">
+            <div　class="thankmsg">訂購成功！！</div>
+            <div class="order_info">
+                <div class="thankmsg">訂單編號：123456789</div>
+                <div class="thankmsg">訂購姓名：</div>
+                <div class="thankmsg">EMAIL：</div>
+                <div class="thankmsg">聯絡電話：</div>
+                <div class="thankmsg">景點名稱：</div>
+                <div class="thankmsg">參觀日期：</div>
+                <div class="thankmsg">時間：</div>
+            </div>
+        </div>
+    -->
+    </div>
+
+    <div class="attfooter">
+        <div class="copyright">COPYRIGHT@2021台北一日遊</div>
+    </div>
+        <!--註冊帳號的表單-->
+        <div class="signup_block">
+            <form class="signup">
+                <div class="deco_bar"></div>
+                <div class="signup_text">註冊會員帳號</div>
+                <img src="../static/close.png" class="close_button" onclick="close_form()"></img>
+                <input class="register_input" name="name" placeholder="輸入姓名"></input>
+                <input class="register_input" name="email" placeholder="輸入電子郵件"></input>
+                <input class="register_input" name="password" placeholder="輸入密碼" type="password"></input>
+                <input class="submit_btn" onclick="register_user()" value="註冊新帳戶"></input>
+                <div class="signup_link"><span id="have_account">已經有帳戶了？</span><span onclick="sign_in()">點此登入</span></div>
+        </form>
+        </div>
+        
+            <!--登入會員的表單-->
+            <div class="login_block">
+                <div class="login">
+                    <div class="deco_bar"></div>
+                    <div class="login_text">登入會員帳號</div>
+                    <img src="../static/close.png" class="close_button" onclick="close_form()"></img>
+                    <input class="login_input" placeholder="輸入電子信箱"></input>
+                    <input class="login_input" placeholder="輸入密碼" type="password"></input>
+                    <input class="submit_btn" onclick="login()" value="登入帳戶"></input>
+                    <div class="login_link">還沒有帳戶？<span onclick="register()">點此註冊</span></div>
+                </div>
+            </div>
+            <script src="{{url_for('static', filename='login.js') }}"></script>
+            <script>
+                function get_order_detail(){
+                    let url = new URLSearchParams(window.location.search);
+                    let orderNumber = url.get("number");
+                    console.log(orderNumber);
+                    fetch("/api/order/"+orderNumber)
+                    .then(response=>{return response.json();})
+                    .then(data=>{
+                        console.log(data);
+                        orderNumber=data.data.number;
+                        name=data.data.contact.name;
+                        email=data.data.contact.email;
+                        phone=data.data.contact.phone;
+                        attraction=data.data.trip.attraction.name;
+                        date=data.data.trip.date;
+                        time=data.data.trip.time;
+
+                        let displayContent = document.querySelector(".thankyou_area")
+                        displayContent.innerHTML=`
+                        <div class="thankyou_content">
+                        <div　class="thankmsg">訂購成功！！</div>
+                        <div class="order_info">
+                            <div class="thankmsg">訂單編號：${orderNumber}</div>
+                            <div class="thankmsg">訂購姓名：${name}</div>
+                            <div class="thankmsg">EMAIL：${email}</div>
+                            <div class="thankmsg">聯絡電話：${phone}</div>
+                            <div class="thankmsg">景點名稱：${attraction}</div>
+                            <div class="thankmsg">參觀日期：${date}</div>
+                            <div class="thankmsg">時間：${time}</div>
+                        </div>
+                        </div>
+                        `
+                    })
+                }
+
+                window.onload =  function () {
+                    checkstatus();
+                    setTimeout(function(){get_order_detail()},300);
+                }
+
+            </script>
+
+            </body>

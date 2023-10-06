@@ -53,14 +53,14 @@
     <div class="booking_container">
         <div class="payment">           
             <div class="contact_title">信用卡付款資訊</div>
-            <div class="contact_field">
-                <span class="contact_text">卡片號碼：</span><input placeholder=" **** **** **** ****" class="contact_content"></input><br>
+            <div class="contact_field" id="card-number">
+                <span class="tpfield">卡片123號碼：</span><input placeholder=" **** **** **** ****" class="contact_content"></input><br>
             </div>
-            <div class="contact_field">
-                <span class="contact_text">過期時間：</span><input placeholder=" MM / YY" class="contact_content"></input><br>
+            <div class="contact_field" id="card-expiration-date">
+                <span class="tpfield">過期時間：</span><input placeholder=" MM / YY" class="contact_content"></input><br>
             </div>
-            <div class="contact_field">
-                <span class="contact_text">驗證密碼：</span><input placeholder=" CVV" class="contact_content"></input><br>
+            <div class="contact_field" id="card-ccv">
+                <span class="tpfield">驗證密碼：</span><input placeholder=" CVV" class="contact_content"></input><br>
             </div>
         </div>
     </div>
@@ -106,6 +106,154 @@
             </div>
  
 <script src="{{url_for('static', filename='login.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://js.tappaysdk.com/sdk/tpdirect/v5.17.0"></script>
+<script>
+    TPDirect.setupSDK(137102, 'app_pSBBbYekJwhkVCN0CUQNqYzQklAFPqskq3UZp7c2xwDHHq9MDS0Ur7DD7yA9', 'sandbox')
+    let fields = {
+        number: {
+            // css selector
+            element: '#card-number',
+            placeholder: '**** **** **** ****'
+        },
+        expirationDate: {
+            // DOM object
+            element: '#card-expiration-date',
+            placeholder: 'MM / YY'
+        },
+        ccv: {
+            element: '#card-ccv',
+            placeholder: 'ccv'
+        }
+    }
+    setTimeout(function(){
+        TPDirect.card.setup({
+        fields: fields,
+        isMaskCreditCardNumber: true,
+        maskCreditCardNumberRange:{ beginIndex:6,endIndex:11},
+        styles:{
+            'input': {
+            'color': 'gray'
+        },
+        // Styling ccv field
+        'input.ccv': {
+            // 'font-size': '16px'
+        },
+        // Styling expiration-date field
+        'input.expiration-date': {
+            // 'font-size': '16px'
+        },
+        // Styling card-number field
+        'input.card-number': {
+            // 'font-size': '16px'
+        },
+        // style focus state
+        ':focus': {
+            // 'color': 'black'
+        },
+        // style valid state
+        '.valid': {
+            'color': 'green'
+        },
+        // style invalid state
+        '.invalid': {
+            'color': 'red'
+        },
+        // Media queries
+        // Note that these apply to the iframe, not the root window.
+        '@media screen and (max-width: 400px)': {
+            'input': {
+                'color': 'orange'
+            }
+
+        }}
+    })}, 2000)
+
+
+    TPDirect.card.onUpdate(function (update) {
+    if (update.canGetPrime) {
+        console.log("獲得Prime");
+        console.log(update);
+        //4242 4242 4242 4242	123	0 - Success ( type : Visa )
+        $('button[type="submit"]').removeAttr('disabled')
+    } else {
+        $('button[type="submit"]').attr('disabled', true)
+        }
+    })
+
+    
+
+    function onSubmit(event) {
+        event.preventDefault()
+
+        // 取得 TapPay Fields 的 status
+        let tappayStatus = TPDirect.card.getTappayFieldsStatus()
+
+        // 確認是否可以 getPrime
+        if (tappayStatus.canGetPrime === false) {
+            alert('資訊欄填寫錯誤')
+            return
+        }
+
+
+        // Get prime
+        TPDirect.card.getPrime((result) => {
+            if (result.status !== 0) {
+                alert('get prime error' + result.msg)
+                return
+            }
+            let prime_key=result.card.prime;
+            let image =document.querySelector(".section_pic").getAttribute("src");
+            let attractionName=document.querySelector(".section_title").textContent;
+            let id=document.querySelector(".section_title").getAttribute("id");
+            let date=document.querySelector("#date").textContent;
+            let time=document.querySelector("#time").textContent;
+            let attractionAddress=document.querySelector("#attraction_address").textContent;
+            let name=document.querySelector("#contact_name").value;
+            let email=document.querySelector("#contact_email").value;
+            let phone=document.querySelector("#contact_phonenumber").value;
+            let price=document.querySelector("#attraction_fee").textContent;
+            if (name ==""){alert("請填寫聯絡資訊");return}
+            if (email==""){alert("請填寫聯絡資訊");return}
+            if (phone==""){alert("請填寫聯絡資訊");return}
+            //let card=document.querySelector('#cc-number').value;
+            //let due_date=document.querySelector("#cc-exp").value;
+            //let ccv=document.querySelector("#cc-ccv").value;
+            alert('交易成功 prime:' + result.card.prime);
+            fetch("api/orders",{
+                method: "POST",
+                headers:{
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                "prime":prime_key,
+                "order":{
+                    "price":price,
+                    "trip":{
+                        "id":id,
+                        "name":attractionName,
+                        "address":attractionAddress,
+                        "image":image
+                    },
+                    "date":date,
+                    "time":time
+                },
+                "contact":{
+                    "name":name,
+                    "email":email,
+                    "phone":phone
+                }
+            })})
+            .then(response=>{return response.json();})
+            .then(data=>{
+                let order_number = data.data.number;
+                delete_schedule();
+                window.location.href="/thankyou?number="+order_number;
+
+            })        
+            })}
+
+</script>
 
 <script>
     function get_schedule(){
@@ -164,42 +312,43 @@
                     <img src="../static/delete.png" class="delete_btn" onclick="delete_schedule()"></img>
                     <img src=${image} class="section_pic"></img>
                     <div class="section_info">
-                        <div class="section_title">${name}</div>
-                        <div class="section_name">日期：<span class="section_content">${date}</span></div>
-                        <div class="section_name">時間：<span class="section_content">${time}</span></div>
-                        <div class="section_name">費用：<span class="section_content">${price}</span></div>
-                        <div class="section_name">地點：<span class="section_content">${address}</span></div>
+                        <div id=${id} class="section_title">${name}</div>
+                        <div class="section_name">日期：<span id="date" class="section_content">${date}</span></div>
+                        <div class="section_name">時間：<span id="time" class="section_content">${time}</span></div>
+                        <div class="section_name">費用：<span id="attraction_fee" class="section_content">${price}</span></div>
+                        <div class="section_name">地點：<span id="attraction_address" class="section_content">${address}</span></div>
                     </div>
                 </div>
             </div>
             <hr class="divider">
+            <form action="/api/orders" method="POST">
             <div class="booking_container">
                 <div class="contact_form">
                     <div class="contact_title">您的聯絡資訊</div>
                     <div class="contact_field">
-                        <span class="contact_text">聯絡姓名：</span><input class="contact_content"></input><br>
+                        <span class="contact_text">聯絡姓名：</span><input id="contact_name" class="contact_content"></input><br>
                     </div>
                     <div class="contact_field">
-                        <span class="contact_text">聯絡信箱：</span><input class="contact_content"></input><br>
+                        <span class="contact_text">聯絡信箱：</span><input id="contact_email" class="contact_content"></input><br>
                     </div>
                     <div class="contact_field">
-                        <span class="contact_text">手機號碼：</span><input class="contact_content"></input><br>
+                        <span class="contact_text">手機號碼：</span><input id="contact_phonenumber" class="contact_content"></input><br>
                     </div>
                     <div class="contact_notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
                 </div>
             </div>
             <hr class="divider">
             <div class="booking_container">
-                <div class="payment">           
-                    <div class="contact_title">信用卡付款資訊</div>
-                    <div class="contact_field">
-                        <span class="contact_text">卡片號碼：</span><input placeholder=" **** **** **** ****" class="contact_content"></input><br>
+                <div class="payment">
+                        <div class="contact_title">信用卡付款資訊</div>    
+                    <div class="card_field">         
+                        <span class="card_info">卡片號碼：</span><div class="tpfield" id="card-number"></div>
                     </div>
-                    <div class="contact_field">
-                        <span class="contact_text">過期時間：</span><input placeholder=" MM / YY" class="contact_content"></input><br>
+                    <div class="card_field">         
+                        <span class="card_info">過期時間：</span><div class="tpfield" id="card-expiration-date"></div>
                     </div>
-                    <div class="contact_field">
-                        <span class="contact_text">驗證密碼：</span><input placeholder=" CVV" class="contact_content"></input><br>
+                    <div class="card_field">         
+                        <span class="card_info">驗證密碼：</span><div class="tpfield" id="card-ccv"></div>
                     </div>
                 </div>
             </div>
@@ -207,9 +356,10 @@
             <div class="confirm_container">
                 <div class="confirm">
                     <div class="confirm_text">總價：新台幣${price}元</div>
-                    <div class="confirm_btn">確認訂購並付款</div>
+                    <div type="submit" onclick="onSubmit(event)" class="confirm_btn">確認訂購並付款</div>
                 </div>
             </div>
+            </form>
             </div>
             <div class="attfooter">
             <div class="copyright">COPYRIGHT@2021台北一日遊</div>
@@ -271,6 +421,8 @@
 
 
     }
+
+
 
 
     window.onload =  function () {
