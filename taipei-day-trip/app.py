@@ -411,7 +411,7 @@ def api_orders():
                 print(primekey,price,id,attractionName,address,image,date,time,name,email,phone,status)
             except Exception as e:
                 print("Request格式錯誤",e)
-                return jsonify({"error":True,"message":"訂單建立失敗"})
+                return jsonify({"error":True,"message":"訂單建立失敗"+e})
             #向第三方支付打API
             request_data={
                 "prime":primekey,
