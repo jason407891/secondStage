@@ -199,7 +199,7 @@
         // Get prime
         TPDirect.card.getPrime((result) => {
             if (result.status !== 0) {
-                alert('get prime error' + result.msg)
+                alert('get prime error:' + result.msg)
                 return
             }
             let prime_key=result.card.prime;
@@ -219,7 +219,6 @@
             //let card=document.querySelector('#cc-number').value;
             //let due_date=document.querySelector("#cc-exp").value;
             //let ccv=document.querySelector("#cc-ccv").value;
-            alert('交易成功 prime:' + result.card.prime);
             fetch("api/orders",{
                 method: "POST",
                 headers:{
